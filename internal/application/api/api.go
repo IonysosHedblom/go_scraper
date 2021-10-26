@@ -11,7 +11,7 @@ type Application struct {
 }
 
 func NewApplication(scraper Scraper) *Application {
-	return &Application{}
+	return &Application{ scraper: scraper }
 }
 
 func (a Application) GetSource(url string) (io.ReadCloser, error) {
