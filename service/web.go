@@ -28,7 +28,6 @@ func (w *scraperService) ConvertToString(body io.ReadCloser) string  {
 
 	defer body.Close()
 	htmlStr := string(dataInBytes)
-	fmt.Println(htmlStr)
 	return htmlStr
 }
 
