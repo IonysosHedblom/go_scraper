@@ -3,7 +3,7 @@ package api
 import "io"
 
 type Scraper interface {
-	GetSource(url string) (io.ReadCloser, error)
 	HandleSource(io.ReadCloser) (string, error)
+	GetElement(src string, sTag string, eTag string) ([]byte, error)
 	ExtractElements(startTag string, endTag string) (string, error)
 }

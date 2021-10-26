@@ -41,3 +41,7 @@ func (s Scraper) GetElement(src string, sTag string, eTag string) ([]byte, error
 	pageTag := []byte(src[elStart:elEnd])
 	return pageTag, nil
 }
+
+func(s Scraper) ExtractElements(src string, target string) (string, error) {
+	return "", nil
+}
