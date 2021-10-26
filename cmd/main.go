@@ -9,7 +9,6 @@ var BaseUrl string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunctio
 
 func main() {
 	scraper := scraper.New()
-	
 	applicationAPI := api.NewApplication(scraper)
 }
 
