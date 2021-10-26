@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ionysoshedblom/go_scraper/internal/application/api"
+	"github.com/ionysoshedblom/go_scraper/internal/api"
 	"github.com/ionysoshedblom/go_scraper/internal/application/scraper"
 )
 
