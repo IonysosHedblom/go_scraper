@@ -1,11 +1,8 @@
 package server
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"golang.org/x/net/html"
 )
 
 func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
@@ -37,26 +34,24 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte(stringRes))
 }
 
-func (s Server) CallSource(url string) ([]string, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
+// func (s Server) CallSource(url string) ([]string, error) {
+// 	res, err := http.Get(url)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	defer res.Body.Close()
+// 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("getting %s: %s", url, res.Status)
-	}
+// 	if res.StatusCode != http.StatusOK {
+// 		return nil, fmt.Errorf("getting %s: %s", url, res.Status)
+// 	}
 
-	doc, err := html.Parse(res.Body)
+// 	doc, err := html.Parse(res.Body)
 
-	if err != nil {
-		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
-	}
+// 	if err != nil {
+// 		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
+// 	}
 
-	
-
-	return doc, nil
-}
+// 	return nil, nil
+// }
 
