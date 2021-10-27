@@ -2,8 +2,6 @@ package api
 
 import (
 	"io"
-	"log"
-	"net/http"
 )
 
 type Application struct {
@@ -12,15 +10,6 @@ type Application struct {
 
 func NewApplication(scraper ScraperPort) *Application {
 	return &Application{ scraper: scraper }
-}
-
-func (a Application) GetSource(url string) (io.ReadCloser, error) {
-	response, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return response.Body, nil
 }
 
 func (a Application) HandleSource(src io.ReadCloser) (string, error) {
