@@ -1,5 +1,7 @@
 package domain
 
+import "golang.org/x/net/html"
+
 type ApiPort interface {
-	HandleSource([]string) (string, error)
+	HandleSource(*html.Node) (string, error)
 }

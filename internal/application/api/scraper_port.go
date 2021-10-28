@@ -1,9 +1,9 @@
 package api
 
-import "io"
+import "golang.org/x/net/html"
 
 type ScraperPort interface {
-	HandleSource(io.ReadCloser) (string, error)
-	GetElement(src string, sTag string, eTag string) ([]byte, error)
-	ExtractElements(startTag string, endTag string) (string, error)
+	HandleSource(*html.Node) (string, error)
+	GetElement(string, string, string) ([]byte, error)
+	ExtractElements(string, string) (string, error)
 }
