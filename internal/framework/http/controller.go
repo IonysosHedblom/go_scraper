@@ -61,6 +61,8 @@ func (s Server) CallSource(url string) (*html.Node, error) {
 	
 	doc, err := html.Parse(res.Body)
 
+	fmt.Println(doc.Data)
+
 	defer res.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
