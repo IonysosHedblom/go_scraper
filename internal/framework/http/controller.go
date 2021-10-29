@@ -31,21 +31,21 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error marshaling body", http.StatusBadRequest)
 	}
 
-	response, err := s.CallSource(requestBody.Url)
+	document, err := s.CallSource(requestBody.Url)
 
 	if err != nil {
 		http.Error(w, "bad payload", http.StatusBadRequest)
 		return
 	}
 
-	html, err := s.api.HandleSource(response)
+	response, err := s.api.HandleSource(document)
 
 	if err != nil {
 		http.Error(w, "something went wrong in api layer", http.StatusBadRequest)
 		return
 	}
 
-	j, _ := json.Marshal(html)
+	j, _ := json.Marshal(response)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
