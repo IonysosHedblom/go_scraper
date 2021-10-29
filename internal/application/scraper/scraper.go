@@ -14,13 +14,13 @@ func New() *Scraper {
 }
 
 func (s Scraper) HandleSource(src *html.Node) ([]entity.Recipe, error) {
-	var results []*bytes.Buffer
+	var b []*bytes.Buffer
 	var visitNode func(*html.Node)
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
 			text := &bytes.Buffer{}
 			writeNodeContentToBuffer(n, text)
-			results = append(results, text)
+			b = append(b, text)
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -29,7 +29,7 @@ func (s Scraper) HandleSource(src *html.Node) ([]entity.Recipe, error) {
 	}
 
 	forEachNode(src, visitNode, nil)
-	recipeTitles := mapBufValuesToStruct(results)
+	recipeTitles := mapBufValuesToStruct(b)
 
 	return recipeTitles, nil
 }
