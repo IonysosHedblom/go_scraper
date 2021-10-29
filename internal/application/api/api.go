@@ -10,7 +10,7 @@ func NewApplication(scraper ScraperPort) *Application {
 	return &Application{ scraper: scraper }
 }
 
-func (a Application) HandleSource(src *html.Node) ([]string, error) {
+func (a Application) HandleSource(src *html.Node) ([]byte, error) {
 	stringSrc, err := a.scraper.HandleSource(src)
 
 	if err != nil {

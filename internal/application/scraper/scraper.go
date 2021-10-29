@@ -3,6 +3,7 @@ package scraper
 import (
 	"fmt"
 
+	"github.com/ionysoshedblom/go_scraper/internal/domain/helpers"
 	"golang.org/x/net/html"
 )
 
@@ -12,7 +13,7 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
-func (s Scraper) HandleSource(src *html.Node) ([]string, error) {	
+func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {	
 	var results []string
 	visitNode := func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "h2" {
@@ -23,7 +24,8 @@ func (s Scraper) HandleSource(src *html.Node) ([]string, error) {
 		}
 	}
 	s.ForEachNode(src, visitNode, nil)
-	return results, nil
+	bytes := helpers.StringSliceToByteSlice(results)
+	return bytes, nil
 }
 
 func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {

@@ -45,7 +45,7 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Write([]byte(html))
+	w.Write(html)
 }
 
 func (s Server) CallSource(url string) (*html.Node, error) {
