@@ -7,13 +7,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Scraper struct {}
+type Scraper struct{}
 
 func New() *Scraper {
 	return &Scraper{}
 }
 
-func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {	
+func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {
 	var results []string
 	visitNode := func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "h2" {

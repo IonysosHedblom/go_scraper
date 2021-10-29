@@ -13,13 +13,13 @@ type Server struct {
 }
 
 func NewServer(api domain.ApiPort) *Server {
-	return &Server{ api: api }
+	return &Server{api: api}
 }
 
 func (httpServer *Server) Run() {
 	http.HandleFunc("/api/scraper", httpServer.Scrape)
-	fmt.Println("Server running on port 1323")
+	fmt.Println("Server running on port 8080")
 	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
-    log.Fatal("ListenAndServe: ", err)
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
