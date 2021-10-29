@@ -1,8 +1,7 @@
 package api
 
 import (
-	"bytes"
-
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
 )
 
@@ -14,7 +13,7 @@ func NewApplication(scraper ScraperPort) *Application {
 	return &Application{scraper: scraper}
 }
 
-func (a Application) HandleSource(src *html.Node) ([]*bytes.Buffer, error) {
+func (a Application) HandleSource(src *html.Node) ([]entity.Recipe, error) {
 	stringSrc, err := a.scraper.HandleSource(src)
 
 	if err != nil {

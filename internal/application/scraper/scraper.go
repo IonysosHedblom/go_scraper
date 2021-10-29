@@ -13,7 +13,7 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
-func (s Scraper) HandleSource(src *html.Node) ([]*bytes.Buffer, error) {
+func (s Scraper) HandleSource(src *html.Node) ([]entity.Recipe, error) {
 	var results []*bytes.Buffer
 	var visitNode func(*html.Node)
 	visitNode = func(n *html.Node) {
@@ -31,6 +31,7 @@ func (s Scraper) HandleSource(src *html.Node) ([]*bytes.Buffer, error) {
 	s.ForEachNode(src, visitNode, nil)
 
 	recipeTitles := s.MapValuesToStruct(results)
+
 	return recipeTitles, nil
 }
 

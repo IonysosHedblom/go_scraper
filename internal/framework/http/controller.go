@@ -39,13 +39,16 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	}
 
 	html, err := s.api.HandleSource(response)
-	fmt.Println(html)
+
 	if err != nil {
 		http.Error(w, "something went wrong in api layer", http.StatusBadRequest)
 		return
 	}
+
+	j, _ := json.Marshal(html)
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("Sometin"))
+	w.Write(j)
 }
 
 func (s Server) CallSource(url string) (*html.Node, error) {
