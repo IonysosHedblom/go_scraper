@@ -2,9 +2,7 @@ package scraper
 
 import (
 	"bytes"
-	"fmt"
 
-	"github.com/ionysoshedblom/go_scraper/internal/domain/helpers"
 	"golang.org/x/net/html"
 )
 
@@ -14,15 +12,15 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
-func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {
-	var results []string
+func (s Scraper) HandleSource(src *html.Node) ([]*bytes.Buffer, error) {
+	var results []*bytes.Buffer
 	var visitNode func(*html.Node)
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
 			text := &bytes.Buffer{}
 			s.CollectText(n, text)
-			fmt.Println(text)
-			results = append(results, n.Data)
+
+			results = append(results, text)
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -30,8 +28,7 @@ func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {
 		}
 	}
 	s.ForEachNode(src, visitNode, nil)
-	bytes := helpers.StringSliceToByteSlice(results)
-	return bytes, nil
+	return results, nil
 }
 
 func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {

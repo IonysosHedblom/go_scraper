@@ -25,27 +25,27 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	}
 	var requestBody urlRequestBody
 
-	json.Unmarshal(body ,&requestBody)
+	json.Unmarshal(body, &requestBody)
 
 	if err != nil {
 		http.Error(w, "error marshaling body", http.StatusBadRequest)
 	}
 
 	response, err := s.CallSource(requestBody.Url)
-	
+
 	if err != nil {
 		http.Error(w, "bad payload", http.StatusBadRequest)
 		return
 	}
-	
+
 	html, err := s.api.HandleSource(response)
-	
+	fmt.Println(html)
 	if err != nil {
-		http.Error(w,"something went wrong in api layer", http.StatusBadRequest)
+		http.Error(w, "something went wrong in api layer", http.StatusBadRequest)
 		return
 	}
-
-	w.Write(html)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("Sometin"))
 }
 
 func (s Server) CallSource(url string) (*html.Node, error) {
@@ -54,17 +54,15 @@ func (s Server) CallSource(url string) (*html.Node, error) {
 		return nil, err
 	}
 
-	
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("getting %s: %s", url, res.Status)
 	}
-	
+
 	doc, err := html.Parse(res.Body)
 
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
 	}
-	
+
 	return doc, nil
 }
-

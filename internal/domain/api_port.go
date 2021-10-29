@@ -1,7 +1,11 @@
 package domain
 
-import "golang.org/x/net/html"
+import (
+	"bytes"
+
+	"golang.org/x/net/html"
+)
 
 type ApiPort interface {
-	HandleSource(*html.Node) ([]byte, error)
+	HandleSource(*html.Node) ([]*bytes.Buffer, error)
 }
