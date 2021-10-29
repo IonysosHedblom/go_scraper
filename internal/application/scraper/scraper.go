@@ -3,6 +3,7 @@ package scraper
 import (
 	"bytes"
 
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
 )
 
@@ -28,7 +29,9 @@ func (s Scraper) HandleSource(src *html.Node) ([]*bytes.Buffer, error) {
 		}
 	}
 	s.ForEachNode(src, visitNode, nil)
-	return results, nil
+
+	recipeTitles := s.MapValuesToStruct(results)
+	return recipeTitles, nil
 }
 
 func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {
@@ -53,4 +56,13 @@ func (s Scraper) CollectText(n *html.Node, buf *bytes.Buffer) {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		s.CollectText(c, buf)
 	}
+}
+
+func (s Scraper) MapValuesToStruct(barr []*bytes.Buffer) []entity.Recipe {
+	var out []entity.Recipe
+	for _, buf := range barr {
+		recipe := &entity.Recipe{Title: buf.String()}
+		out = append(out, *recipe)
+	}
+	return out
 }
