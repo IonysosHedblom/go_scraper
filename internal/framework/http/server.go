@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain"
@@ -18,5 +19,7 @@ func NewServer(api domain.ApiPort) *Server {
 func (httpServer *Server) Run() {
 	http.HandleFunc("/api/scraper", httpServer.Scrape)
 	fmt.Println("Server running on port 1323")
-	http.ListenAndServe(":1323", nil)
+	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
+    log.Fatal("ListenAndServe: ", err)
+	}
 }

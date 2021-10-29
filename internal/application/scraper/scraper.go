@@ -17,6 +17,7 @@ func (s Scraper) HandleSource(src *html.Node) ([]byte, error) {
 	var results []string
 	visitNode := func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "h2" {
+			fmt.Println(n)
 			for _, a := range n.Attr {
 				fmt.Println(a.Val)
 				results = append(results, a.Val)

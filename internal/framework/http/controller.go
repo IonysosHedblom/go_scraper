@@ -32,7 +32,7 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	}
 
 	response, err := s.CallSource(requestBody.Url)
-
+	
 	if err != nil {
 		http.Error(w, "bad payload", http.StatusBadRequest)
 		return
@@ -61,7 +61,6 @@ func (s Server) CallSource(url string) (*html.Node, error) {
 	
 	doc, err := html.Parse(res.Body)
 
-	defer res.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
 	}

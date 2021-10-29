@@ -1,6 +1,6 @@
 package entity
 
 type Recipe struct {
-	Title string
+	Title       string
 	Description string
 }
