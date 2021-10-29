@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"fmt"
-	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -13,28 +12,30 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
-func (s Scraper) HandleSource(src *html.Node) (string, error) {	
-	return "", nil
+func (s Scraper) HandleSource(src *html.Node) ([]string, error) {	
+	var results []string
+	visitNode := func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "h2" {
+			for _, a := range n.Attr {
+				fmt.Println(a.Val)
+				results = append(results, a.Val)
+			}
+		}
+	}
+	s.ForEachNode(src, visitNode, nil)
+	return results, nil
 }
 
-func (s Scraper) GetElement(src string, sTag string, eTag string) ([]byte, error) {
-	elStart := strings.Index(src, sTag)
-	noElStart := elStart == -1
-	if noElStart {
-		return nil, fmt.Errorf("no %v starttag found", sTag)
+func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
 	}
 
-	elEnd := strings.Index(src, eTag)
-	noElEnd := elEnd == -1
-	
-	if noElEnd {
-		return nil, fmt.Errorf("no %v endtag found", eTag)
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		s.ForEachNode(c, pre, post)
 	}
 
-	pageTag := []byte(src[elStart:elEnd])
-	return pageTag, nil
-}
-
-func(s Scraper) ExtractElements(src string, target string) (string, error) {
-	return "", nil
+	if post != nil {
+		post(n)
+	}
 }
