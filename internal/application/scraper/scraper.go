@@ -19,8 +19,7 @@ func (s Scraper) HandleSource(src *html.Node) ([]entity.Recipe, error) {
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
 			text := &bytes.Buffer{}
-			s.CollectText(n, text)
-
+			writeNodeContentToBuffer(n, text)
 			results = append(results, text)
 		}
 
@@ -28,20 +27,20 @@ func (s Scraper) HandleSource(src *html.Node) ([]entity.Recipe, error) {
 			visitNode(c)
 		}
 	}
-	s.ForEachNode(src, visitNode, nil)
 
-	recipeTitles := s.MapValuesToStruct(results)
+	forEachNode(src, visitNode, nil)
+	recipeTitles := mapBufValuesToStruct(results)
 
 	return recipeTitles, nil
 }
 
-func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	if pre != nil {
 		pre(n)
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		s.ForEachNode(c, pre, post)
+		forEachNode(c, pre, post)
 	}
 
 	if post != nil {
@@ -49,17 +48,17 @@ func (s Scraper) ForEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	}
 }
 
-func (s Scraper) CollectText(n *html.Node, buf *bytes.Buffer) {
+func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 	if n.Type == html.TextNode {
 		buf.WriteString(n.Data)
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		s.CollectText(c, buf)
+		writeNodeContentToBuffer(c, buf)
 	}
 }
 
-func (s Scraper) MapValuesToStruct(barr []*bytes.Buffer) []entity.Recipe {
+func mapBufValuesToStruct(barr []*bytes.Buffer) []entity.Recipe {
 	var out []entity.Recipe
 	for _, buf := range barr {
 		recipe := &entity.Recipe{Title: buf.String()}
