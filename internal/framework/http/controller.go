@@ -17,11 +17,13 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	qs := req.URL.Query()
 	if len(qs) > 1 {
 		http.Error(w, "too much queries", http.StatusBadRequest)
+		return
 	}
 
 	q := qs["query"]
 	if len(q) > 1 {
 		http.Error(w, "too much queries", http.StatusBadRequest)
+		return
 	}
 
 	url := buildUrl(q[0])
