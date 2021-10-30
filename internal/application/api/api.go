@@ -6,10 +6,10 @@ import (
 )
 
 type Application struct {
-	scraper ScraperPort
+	scraper ScraperService
 }
 
-func NewApplication(scraper ScraperPort) *Application {
+func NewApplication(scraper ScraperService) *Application {
 	return &Application{scraper: scraper}
 }
 

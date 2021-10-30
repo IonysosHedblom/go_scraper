@@ -5,6 +5,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type ApiPort interface {
+type ApiService interface {
 	HandleSource(*html.Node) ([]entity.Recipe, error)
 }

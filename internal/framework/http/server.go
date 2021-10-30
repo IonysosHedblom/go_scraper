@@ -9,10 +9,10 @@ import (
 )
 
 type Server struct {
-	api domain.ApiPort
+	api domain.ApiService
 }
 
-func NewServer(api domain.ApiPort) *Server {
+func NewServer(api domain.ApiService) *Server {
 	return &Server{api: api}
 }
 
