@@ -5,6 +5,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type ScraperService interface {
+type ScraperPort interface {
 	HandleSource(src *html.Node) ([]entity.Recipe, error)
 }
