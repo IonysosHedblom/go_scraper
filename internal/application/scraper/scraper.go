@@ -38,9 +38,9 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	}
 
 	forEachNode(n, visitNode, nil)
-	recipies := mapBufValuesToStruct(titles, desc)
-	fmt.Println(recipies)
-	return recipies, nil
+	recipes := mapBufValuesToStruct(titles, desc)
+	fmt.Println(recipes)
+	return recipes, nil
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {

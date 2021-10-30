@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ionysoshedblom/go_scraper/internal/domain"
+	domain "github.com/ionysoshedblom/go_scraper/internal/domain/interfaces"
 )
 
 type Server struct {

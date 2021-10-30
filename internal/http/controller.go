@@ -16,7 +16,7 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 
 	qs := req.URL.Query()
 	if len(qs) > 1 {
-		http.Error(w, "too much queries", http.StatusBadRequest)
+		http.Error(w, "too many queries", http.StatusBadRequest)
 		return
 	}
 
