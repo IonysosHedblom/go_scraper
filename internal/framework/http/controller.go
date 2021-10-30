@@ -8,10 +8,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-// type urlRequestBody struct {
-// 	Url string
-// }
-
 func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
@@ -19,19 +15,15 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	}
 
 	qs := req.URL.Query()
+	if len(qs) > 1 {
+		http.Error(w, "too much queries", http.StatusBadRequest)
+	}
+
 	q := qs["query"]
+	if len(q) > 1 {
+		http.Error(w, "too much queries", http.StatusBadRequest)
+	}
 
-	// body, err := ioutil.ReadAll(req.Body)
-	// if err != nil {
-	// 	http.Error(w, "error", http.StatusBadRequest)
-	// }
-	// var requestBody urlRequestBody
-
-	// json.Unmarshal(body, &requestBody)
-
-	// if err != nil {
-	// 	http.Error(w, "error marshaling body", http.StatusBadRequest)
-	// }
 	url := buildUrl(q[0])
 
 	document, err := s.CallSource(url)
