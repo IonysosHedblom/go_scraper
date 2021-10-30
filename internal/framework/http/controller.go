@@ -3,15 +3,14 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"golang.org/x/net/html"
 )
 
-type urlRequestBody struct {
-	Url string
-}
+// type urlRequestBody struct {
+// 	Url string
+// }
 
 func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
@@ -19,19 +18,23 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		http.Error(w, "error", http.StatusBadRequest)
-	}
-	var requestBody urlRequestBody
+	qs := req.URL.Query()
+	q := qs["query"]
 
-	json.Unmarshal(body, &requestBody)
+	// body, err := ioutil.ReadAll(req.Body)
+	// if err != nil {
+	// 	http.Error(w, "error", http.StatusBadRequest)
+	// }
+	// var requestBody urlRequestBody
 
-	if err != nil {
-		http.Error(w, "error marshaling body", http.StatusBadRequest)
-	}
+	// json.Unmarshal(body, &requestBody)
 
-	document, err := s.CallSource(requestBody.Url)
+	// if err != nil {
+	// 	http.Error(w, "error marshaling body", http.StatusBadRequest)
+	// }
+	url := buildUrl(q[0])
+
+	document, err := s.CallSource(url)
 
 	if err != nil {
 		http.Error(w, "bad payload", http.StatusBadRequest)
@@ -68,4 +71,9 @@ func (s Server) CallSource(url string) (*html.Node, error) {
 	}
 
 	return doc, nil
+}
+
+func buildUrl(query string) string {
+	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
+	return url
 }
