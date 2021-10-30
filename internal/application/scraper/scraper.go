@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
@@ -14,13 +15,21 @@ func New() *Scraper {
 }
 
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
-	var b []*bytes.Buffer
+	var titles []*bytes.Buffer
+	var desc []*bytes.Buffer
 	var visitNode func(*html.Node)
+
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
-			text := &bytes.Buffer{}
-			writeNodeContentToBuffer(n, text)
-			b = append(b, text)
+			titleBuf := &bytes.Buffer{}
+			writeNodeContentToBuffer(n, titleBuf)
+			titles = append(titles, titleBuf)
+		}
+
+		if n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p" {
+			dBuf := &bytes.Buffer{}
+			writeNodeContentToBuffer(n, dBuf)
+			desc = append(desc, dBuf)
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -29,9 +38,9 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	}
 
 	forEachNode(n, visitNode, nil)
-	recipeTitles := mapBufValuesToStruct(b)
-
-	return recipeTitles, nil
+	recipies := mapBufValuesToStruct(titles, desc)
+	fmt.Println(recipies)
+	return recipies, nil
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
@@ -58,10 +67,10 @@ func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 	}
 }
 
-func mapBufValuesToStruct(barr []*bytes.Buffer) []entity.Recipe {
+func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) []entity.Recipe {
 	var out []entity.Recipe
-	for _, buf := range barr {
-		recipe := &entity.Recipe{Title: buf.String()}
+	for i := 0; i < len(titles); i++ {
+		recipe := &entity.Recipe{Title: titles[i].String(), Description: descriptions[i].String()}
 		out = append(out, *recipe)
 	}
 	return out
