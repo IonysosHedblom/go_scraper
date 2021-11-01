@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/ionysoshedblom/go_scraper/internal/application/api"
+	"github.com/ionysoshedblom/go_scraper/internal/api"
+	app "github.com/ionysoshedblom/go_scraper/internal/application"
 	"github.com/ionysoshedblom/go_scraper/internal/application/scraper"
-	server "github.com/ionysoshedblom/go_scraper/internal/http"
 )
 
 func main() {
 	scraper := scraper.New()
-	applicationAPI := api.NewApplication(scraper)
+	applicationAPI := app.NewApplication(scraper)
 
-	httpServer := server.NewServer(applicationAPI)
+	httpServer := api.NewServer(applicationAPI)
 	httpServer.Run()
 }
