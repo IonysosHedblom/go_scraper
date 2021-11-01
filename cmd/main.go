@@ -8,8 +8,8 @@ import (
 
 func main() {
 	scraper := scraper.New()
-	applicationAPI := app.NewApplication(scraper)
+	application := app.NewApplication(scraper)
 
-	httpServer := api.NewServer(applicationAPI)
+	httpServer := api.NewApi(application)
 	httpServer.Run()
 }

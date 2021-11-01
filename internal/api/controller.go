@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
+func (s Api) Scrape(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
@@ -48,7 +48,7 @@ func (s Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	w.Write(j)
 }
 
-func (s Server) CallSource(url string) (*html.Node, error) {
+func (s Api) CallSource(url string) (*html.Node, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
