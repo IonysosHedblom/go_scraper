@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
@@ -39,7 +38,6 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	forEachNode(n, visitNode, nil)
 	recipes := mapBufValuesToStruct(titles, desc)
-	fmt.Println(recipes)
 	return recipes, nil
 }
 
