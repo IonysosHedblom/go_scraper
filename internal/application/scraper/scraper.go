@@ -16,6 +16,7 @@ func New() *Scraper {
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []*bytes.Buffer
 	var desc []*bytes.Buffer
+	// var imageUrls []*bytes.Buffer
 	var visitNode func(*html.Node)
 
 	visitNode = func(n *html.Node) {
@@ -30,6 +31,12 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 			writeNodeContentToBuffer(n, dBuf)
 			desc = append(desc, dBuf)
 		}
+
+		// if n.Type == html.ElementNode && n.Parent.Data == "noscript" && n.Data == "img" {
+		// 	iBuf := &bytes.Buffer{}
+		// 	writeNodeContentToBuffer(n, iBuf)
+		// 	imageUrls = append(imageUrls, iBuf)
+		// }
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			visitNode(c)
@@ -59,6 +66,10 @@ func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 	if n.Type == html.TextNode {
 		buf.WriteString(n.Data)
 	}
+
+	// if n.Type == html.ElementNode {
+	// 	buf.WriteString(n.Data)
+	// }
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		writeNodeContentToBuffer(c, buf)
