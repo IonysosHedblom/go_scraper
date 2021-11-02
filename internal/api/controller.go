@@ -22,7 +22,7 @@ func (s Api) Scrape(w http.ResponseWriter, req *http.Request) {
 
 	q := qs["query"]
 	if len(q) > 1 {
-		http.Error(w, "too much queries", http.StatusBadRequest)
+		http.Error(w, "too many queries", http.StatusBadRequest)
 		return
 	}
 
