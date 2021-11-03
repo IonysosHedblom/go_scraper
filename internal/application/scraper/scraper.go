@@ -2,6 +2,9 @@ package scraper
 
 import (
 	"bytes"
+	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
@@ -15,6 +18,8 @@ func New() *Scraper {
 
 // Img format in node - massage this later
 // "\n                    <img src=\"//assets.icanet.se/t_ICAseAbsoluteUrl/imagevaultfiles/id_63195/cf_5291/paj_med_adelost_och_purjolok.jpg\" alt=\"Paj med ädelost och purjolök\" class=\"lazyNoscriptActive\" />\n                "
+// 20 space
+var ImgRegex string = `\n\s+<img`
 
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []*bytes.Buffer
@@ -35,7 +40,15 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 			desc = append(desc, dBuf)
 		}
 
-		if n.Type == html.ElementNode && n.Parent.Data == "noscript" && n.Data == "img" {
+		rx, _ := regexp.Compile(ImgRegex)
+		match := rx.MatchString(n.Data)
+
+		isImgTag := strings.Contains(n.Data, "\n                    <img")
+
+		if match {
+			fmt.Println(n.Data)
+		}
+		if n.Type == html.ElementNode && n.Parent.Data == "noscript" && isImgTag {
 			iBuf := &bytes.Buffer{}
 			writeNodeContentToBuffer(n, iBuf)
 			imageUrls = append(imageUrls, iBuf)
