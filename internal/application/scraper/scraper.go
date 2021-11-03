@@ -13,6 +13,9 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
+// Img format in node - massage this later
+// "\n                    <img src=\"//assets.icanet.se/t_ICAseAbsoluteUrl/imagevaultfiles/id_63195/cf_5291/paj_med_adelost_och_purjolok.jpg\" alt=\"Paj med ädelost och purjolök\" class=\"lazyNoscriptActive\" />\n                "
+
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []*bytes.Buffer
 	var desc []*bytes.Buffer
