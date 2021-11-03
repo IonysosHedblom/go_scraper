@@ -16,10 +16,9 @@ func New() *Scraper {
 	return &Scraper{}
 }
 
-// Img format in node - massage this later
-// "\n                    <img src=\"//assets.icanet.se/t_ICAseAbsoluteUrl/imagevaultfiles/id_63195/cf_5291/paj_med_adelost_och_purjolok.jpg\" alt=\"Paj med ädelost och purjolök\" class=\"lazyNoscriptActive\" />\n                "
-// 20 space
-var ImgRegex string = `\n\s+<img`
+// <img src="//assets.icanet.se/t_ICAseAbsoluteUrl/imagevaultfiles/id_228677/cf_5291/paj_med_vegobacon_och_tomatsallad.jpg" alt="Paj med vegobacon och tomatsallad" class="lazyNoscriptActive" />
+
+var ImgRegex string = `\n\s+<img src=`
 
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []*bytes.Buffer
@@ -43,14 +42,11 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 		rx, _ := regexp.Compile(ImgRegex)
 		match := rx.MatchString(n.Data)
 
-		isImgTag := strings.Contains(n.Data, "\n                    <img")
-
 		if match {
-			fmt.Println(n.Data)
-		}
-		if n.Type == html.ElementNode && n.Parent.Data == "noscript" && isImgTag {
+			n.Data = strings.TrimSpace(n.Data)
+			n.Data = getImageSrc(n.Data)
 			iBuf := &bytes.Buffer{}
-			writeNodeContentToBuffer(n, iBuf)
+			iBuf.WriteString(n.Data)
 			imageUrls = append(imageUrls, iBuf)
 		}
 
@@ -60,6 +56,10 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	}
 
 	forEachNode(n, visitNode, nil)
+
+	fmt.Printf("IMAGE URLS %v", len(imageUrls))
+	fmt.Printf("TITLES %v", len(titles))
+	fmt.Printf("DESCRIPTIONS %v", len(desc))
 	recipes := mapBufValuesToStruct(titles, desc)
 	return recipes, nil
 }
@@ -83,10 +83,6 @@ func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 		buf.WriteString(n.Data)
 	}
 
-	if n.Type == html.ElementNode {
-		buf.WriteString(n.Data)
-	}
-
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		writeNodeContentToBuffer(c, buf)
 	}
@@ -98,5 +94,21 @@ func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) 
 		recipe := &entity.Recipe{Title: titles[i].String(), Description: descriptions[i].String()}
 		out = append(out, *recipe)
 	}
+	return out
+}
+
+func getImageSrc(tag string) string {
+	var out string = "https:"
+
+	for idx, char := range tag {
+		if string(char) == `"` && idx > 10 {
+			return out
+		}
+
+		if idx > 9 {
+			out += string(char)
+		}
+	}
+
 	return out
 }
