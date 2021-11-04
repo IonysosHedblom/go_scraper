@@ -41,7 +41,6 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 		rx, _ := regexp.Compile(ImgRegex)
 		match := rx.MatchString(n.Data)
-
 		if match {
 			n.Data = strings.TrimSpace(n.Data)
 			n.Data = getImageSrc(n.Data)
@@ -95,6 +94,10 @@ func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) 
 		out = append(out, *recipe)
 	}
 	return out
+}
+
+func existsInBuf(buf *bytes.Buffer, value string) {
+
 }
 
 func getImageSrc(tag string) string {
