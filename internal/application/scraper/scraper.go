@@ -89,10 +89,12 @@ func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 
 func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer, imageUrls []*bytes.Buffer) []entity.Recipe {
 	var out []entity.Recipe
+
 	for i := 0; i < len(titles); i++ {
 		recipe := &entity.Recipe{Title: titles[i].String(), Description: descriptions[i].String(), ImageUrl: imageUrls[i].String()}
 		out = append(out, *recipe)
 	}
+
 	return out
 }
 
