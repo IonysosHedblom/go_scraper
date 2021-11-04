@@ -28,8 +28,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
-			stringExists := existsInBuf(titles, n.Data)
-
+			stringExists := existsInBuf(titles, n.FirstChild.Data)
 			if !stringExists {
 				titleBuf := &bytes.Buffer{}
 				writeNodeContentToBuffer(n, titleBuf)
@@ -38,7 +37,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 		}
 
 		if n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p" {
-			stringExists := existsInBuf(desc, n.Data)
+			stringExists := existsInBuf(desc, n.FirstChild.Data)
 			if !stringExists {
 				dBuf := &bytes.Buffer{}
 				writeNodeContentToBuffer(n, dBuf)
@@ -104,6 +103,9 @@ func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) 
 }
 
 func existsInBuf(bufList []*bytes.Buffer, value string) bool {
+	fmt.Printf("BUFLIST: %v", bufList)
+	fmt.Printf("VALUE: %v", value)
+
 	for _, b := range bufList {
 		if b.String() == value {
 			return true
