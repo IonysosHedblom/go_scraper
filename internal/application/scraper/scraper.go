@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -15,8 +14,6 @@ type Scraper struct{}
 func New() *Scraper {
 	return &Scraper{}
 }
-
-// <img src="//assets.icanet.se/t_ICAseAbsoluteUrl/imagevaultfiles/id_228677/cf_5291/paj_med_vegobacon_och_tomatsallad.jpg" alt="Paj med vegobacon och tomatsallad" class="lazyNoscriptActive" />
 
 var ImgRegex string = `\n\s+<img src=`
 
@@ -62,9 +59,6 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	forEachNode(n, visitNode, nil)
 
-	fmt.Printf("IMAGE URLS %v", len(imageUrls))
-	fmt.Printf("TITLES %v", len(titles))
-	fmt.Printf("DESCRIPTIONS %v", len(desc))
 	recipes := mapBufValuesToStruct(titles, desc)
 	return recipes, nil
 }
@@ -103,9 +97,6 @@ func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) 
 }
 
 func existsInBuf(bufList []*bytes.Buffer, value string) bool {
-	fmt.Printf("BUFLIST: %v", bufList)
-	fmt.Printf("VALUE: %v", value)
-
 	for _, b := range bufList {
 		if b.String() == value {
 			return true
