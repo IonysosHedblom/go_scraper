@@ -28,15 +28,22 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	visitNode = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
-			titleBuf := &bytes.Buffer{}
-			writeNodeContentToBuffer(n, titleBuf)
-			titles = append(titles, titleBuf)
+			stringExists := existsInBuf(titles, n.Data)
+
+			if !stringExists {
+				titleBuf := &bytes.Buffer{}
+				writeNodeContentToBuffer(n, titleBuf)
+				titles = append(titles, titleBuf)
+			}
 		}
 
 		if n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p" {
-			dBuf := &bytes.Buffer{}
-			writeNodeContentToBuffer(n, dBuf)
-			desc = append(desc, dBuf)
+			stringExists := existsInBuf(desc, n.Data)
+			if !stringExists {
+				dBuf := &bytes.Buffer{}
+				writeNodeContentToBuffer(n, dBuf)
+				desc = append(desc, dBuf)
+			}
 		}
 
 		rx, _ := regexp.Compile(ImgRegex)
@@ -96,8 +103,13 @@ func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer) 
 	return out
 }
 
-func existsInBuf(buf *bytes.Buffer, value string) {
-
+func existsInBuf(bufList []*bytes.Buffer, value string) bool {
+	for _, b := range bufList {
+		if b.String() == value {
+			return true
+		}
+	}
+	return false
 }
 
 func getImageSrc(tag string) string {
