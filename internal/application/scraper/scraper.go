@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -41,10 +40,6 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 				writeNodeContentToBuffer(n, dBuf)
 				desc = append(desc, dBuf)
 			}
-		}
-
-		if n.Type == html.ElementNode && n.Parent.Data == "ul" && n.Data == "li" {
-			fmt.Println(n)
 		}
 
 		rx, _ := regexp.Compile(ImgRegex)
