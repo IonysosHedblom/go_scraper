@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -22,7 +21,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []*bytes.Buffer
 	var desc []*bytes.Buffer
 	var imageUrls []*bytes.Buffer
-	var ingredients []*bytes.Buffer
+	var ingredients [][]string
 
 	var visitNode func(*html.Node)
 
@@ -46,9 +45,10 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 		}
 
 		if n.Type == html.ElementNode && n.Parent.Data == "li" && n.Data == "span" && n.Attr[1].Val == "ingredients" {
-			ingredientBuf := &bytes.Buffer{}
-			ingredientBuf.WriteString(n.Attr[0].Val)
-			ingredients = append(ingredients, ingredientBuf)
+			var ingredientsSlice []string = strings.Split(n.Attr[0].Val, "\n")
+			// ingredientBuf := &bytes.Buffer{}
+			// ingredientBuf.WriteString(n.Attr[0].Val)
+			ingredients = append(ingredients, ingredientsSlice)
 		}
 
 		rx, _ := regexp.Compile(ImgRegex)
@@ -67,7 +67,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	}
 
 	forEachNode(n, visitNode, nil)
-	fmt.Println(ingredients)
+
 	recipes := mapBufValuesToStruct(titles, desc, imageUrls, ingredients)
 	return recipes, nil
 }
@@ -96,11 +96,11 @@ func writeNodeContentToBuffer(n *html.Node, buf *bytes.Buffer) {
 	}
 }
 
-func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer, imageUrls []*bytes.Buffer, ingredients []*bytes.Buffer) []entity.Recipe {
+func mapBufValuesToStruct(titles []*bytes.Buffer, descriptions []*bytes.Buffer, imageUrls []*bytes.Buffer, ingredients [][]string) []entity.Recipe {
 	var out []entity.Recipe
 
 	for i := 0; i < len(titles); i++ {
-		recipe := &entity.Recipe{Title: titles[i].String(), Description: descriptions[i].String(), ImageUrl: imageUrls[i].String(), Ingredients: ingredients[i].String()}
+		recipe := &entity.Recipe{Title: titles[i].String(), Description: descriptions[i].String(), ImageUrl: imageUrls[i].String(), Ingredients: ingredients[i]}
 		out = append(out, *recipe)
 	}
 
