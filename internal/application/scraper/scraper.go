@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -22,9 +23,9 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var imageUrls []string
 	var ingredients [][]string
 
-	var visitNode func(*html.Node)
+	var visitNode func(*html.Node) error
 
-	visitNode = func(n *html.Node) {
+	visitNode = func(n *html.Node) error {
 		if n.Type == html.ElementNode && n.Parent.Data == "h2" {
 			stringExists := existsInSlice(titles, n.FirstChild.Data)
 			if !stringExists {
@@ -44,9 +45,9 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 			ingredients = append(ingredients, ingredientsSlice)
 		}
 
-		rx, _ := regexp.Compile(ImgRegex)
-		match := rx.MatchString(n.Data)
-		if match {
+		imageFound := isRegexMatch(ImgRegex, n.Data)
+
+		if imageFound {
 			n.Data = strings.TrimSpace(n.Data)
 			n.Data = getImageSrc(n.Data)
 			imageUrls = append(imageUrls, n.Data)
@@ -55,6 +56,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			visitNode(c)
 		}
+		return nil
 	}
 
 	forEachNode(n, visitNode, nil)
@@ -63,7 +65,18 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	return recipes, nil
 }
 
-func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+func isRegexMatch(regex string, target string) bool {
+	rx, err := regexp.Compile(regex)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	match := rx.MatchString(target)
+
+	return match
+}
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node) error) {
 	if pre != nil {
 		pre(n)
 	}
