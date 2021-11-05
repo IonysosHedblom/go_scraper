@@ -19,7 +19,7 @@ var ImgRegex string = `\n\s+<img src=`
 
 func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	var titles []string
-	var desc []string
+	var descriptions []string
 	var imageUrls []string
 	var ingredients [][]string
 
@@ -32,22 +32,18 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 		isImage := isRegexMatch(ImgRegex, n.Data)
 
 		if isImage {
+
 			n.Data = strings.TrimSpace(n.Data)
 			n.Data = getImageSrc(n.Data)
 			imageUrls = append(imageUrls, n.Data)
-		} else if isTitle {
-			stringExists := existsInSlice(titles, n.FirstChild.Data)
 
-			if !stringExists {
-				titles = append(titles, n.FirstChild.Data)
-			}
+		} else if isTitle {
+
+			titles = appendNonDuplicates(titles, n.FirstChild.Data)
 
 		} else if isDescription {
-			stringExists := existsInSlice(desc, n.FirstChild.Data)
 
-			if !stringExists {
-				desc = append(desc, n.FirstChild.Data)
-			}
+			descriptions = appendNonDuplicates(descriptions, n.FirstChild.Data)
 
 		} else if isIngredientsList {
 			ingredientsSlice := strings.Split(n.Attr[0].Val, "\n")
@@ -61,8 +57,18 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	forEachNode(n, visitNode, nil)
 
-	recipes := mapSliceValuesToRecipe(titles, desc, imageUrls, ingredients)
+	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
 	return recipes, nil
+}
+
+func appendNonDuplicates(targetSlice []string, value string) []string {
+	stringExists := existsInSlice(targetSlice, value)
+
+	if !stringExists {
+		targetSlice = append(targetSlice, value)
+	}
+
+	return targetSlice
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
