@@ -59,7 +59,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 	forEachNode(n, visitNode, nil)
 
-	recipes := mapBufValuesToStruct(titles, desc, imageUrls, ingredients)
+	recipes := mapSliceValuesToRecipe(titles, desc, imageUrls, ingredients)
 	return recipes, nil
 }
 
@@ -77,7 +77,7 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	}
 }
 
-func mapBufValuesToStruct(titles []string, descriptions []string, imageUrls []string, ingredients [][]string) []entity.Recipe {
+func mapSliceValuesToRecipe(titles []string, descriptions []string, imageUrls []string, ingredients [][]string) []entity.Recipe {
 	var out []entity.Recipe
 
 	for i := 0; i < len(titles); i++ {
