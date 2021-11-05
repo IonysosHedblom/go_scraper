@@ -9,7 +9,7 @@ import (
 )
 
 func (s Api) Scrape(w http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
+	if req.Method != "GET" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
 	}
