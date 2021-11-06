@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (s Api) Scrape(w http.ResponseWriter, req *http.Request) {
+func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
