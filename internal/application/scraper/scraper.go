@@ -60,6 +60,34 @@ func (s Scraper) HandleSource(n *html.Node) []entity.Recipe {
 	return recipes
 }
 
+func isRegexMatch(regex string, target string) bool {
+	rx, err := regexp.Compile(regex)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	match := rx.MatchString(target)
+
+	return match
+}
+
+func getImageSrc(tag string) string {
+	tag = strings.TrimSpace(tag)
+	var out string = "https:"
+
+	for idx, char := range tag {
+		if string(char) == `"` && idx > 10 {
+			return out
+		}
+
+		if idx > 9 {
+			out += string(char)
+		}
+	}
+
+	return out
+}
+
 func appendNonDuplicates(targetSlice []string, value string) []string {
 	stringExists := existsInSlice(targetSlice, value)
 
@@ -68,6 +96,15 @@ func appendNonDuplicates(targetSlice []string, value string) []string {
 	}
 
 	return targetSlice
+}
+
+func existsInSlice(slice []string, value string) bool {
+	for _, b := range slice {
+		if b == value {
+			return true
+		}
+	}
+	return false
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
@@ -93,41 +130,4 @@ func mapSliceValuesToRecipe(titles []string, descriptions []string, imageUrls []
 	}
 
 	return recipes
-}
-
-func existsInSlice(slice []string, value string) bool {
-	for _, b := range slice {
-		if b == value {
-			return true
-		}
-	}
-	return false
-}
-
-func getImageSrc(tag string) string {
-	tag = strings.TrimSpace(tag)
-	var out string = "https:"
-
-	for idx, char := range tag {
-		if string(char) == `"` && idx > 10 {
-			return out
-		}
-
-		if idx > 9 {
-			out += string(char)
-		}
-	}
-
-	return out
-}
-
-func isRegexMatch(regex string, target string) bool {
-	rx, err := regexp.Compile(regex)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	match := rx.MatchString(target)
-
-	return match
 }
