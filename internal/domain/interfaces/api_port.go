@@ -6,5 +6,5 @@ import (
 )
 
 type ApiPort interface {
-	HandleSource(*html.Node) ([]entity.Recipe, error)
+	HandleSource(*html.Node) []entity.Recipe
 }

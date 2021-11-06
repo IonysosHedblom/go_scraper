@@ -6,5 +6,5 @@ import (
 )
 
 type ScraperPort interface {
-	HandleSource(src *html.Node) ([]entity.Recipe, error)
+	HandleSource(src *html.Node) []entity.Recipe
 }

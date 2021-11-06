@@ -35,12 +35,7 @@ func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response, err := s.api.HandleSource(document)
-
-	if err != nil {
-		http.Error(w, "something went wrong in api layer", http.StatusBadRequest)
-		return
-	}
+	response := s.api.HandleSource(document)
 
 	j, _ := json.Marshal(response)
 

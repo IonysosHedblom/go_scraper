@@ -13,12 +13,8 @@ func NewApplication(scraper ScraperPort) *Application {
 	return &Application{scraper: scraper}
 }
 
-func (a Application) HandleSource(src *html.Node) ([]entity.Recipe, error) {
-	stringSrc, err := a.scraper.HandleSource(src)
+func (a Application) HandleSource(src *html.Node) []entity.Recipe {
+	stringSrc := a.scraper.HandleSource(src)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return stringSrc, nil
+	return stringSrc
 }
