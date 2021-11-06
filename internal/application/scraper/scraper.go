@@ -85,14 +85,14 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 }
 
 func mapSliceValuesToRecipe(titles []string, descriptions []string, imageUrls []string, ingredients [][]string) []entity.Recipe {
-	var out []entity.Recipe
+	var recipes []entity.Recipe
 
 	for i := 0; i < len(titles); i++ {
 		recipe := &entity.Recipe{Title: titles[i], Description: descriptions[i], ImageUrl: imageUrls[i], Ingredients: ingredients[i]}
-		out = append(out, *recipe)
+		recipes = append(recipes, *recipe)
 	}
 
-	return out
+	return recipes
 }
 
 func existsInSlice(slice []string, value string) bool {
