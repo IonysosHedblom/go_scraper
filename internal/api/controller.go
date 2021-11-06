@@ -14,13 +14,13 @@ func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	qs := req.URL.Query()
-	if len(qs) > 1 {
+	queries := req.URL.Query()
+	if len(queries) > 1 {
 		http.Error(w, "too many queries", http.StatusBadRequest)
 		return
 	}
 
-	q := qs["query"]
+	q := queries["query"]
 	if len(q) > 1 {
 		http.Error(w, "too many queries", http.StatusBadRequest)
 		return
