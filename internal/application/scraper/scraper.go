@@ -17,7 +17,7 @@ func New() *Scraper {
 
 var ImgRegex string = `\n\s+<img src=`
 
-func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
+func (s Scraper) HandleSource(n *html.Node) []entity.Recipe {
 	var titles []string
 	var descriptions []string
 	var imageUrls []string
@@ -57,7 +57,7 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 	forEachNode(n, visitNode, nil)
 
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
-	return recipes, nil
+	return recipes
 }
 
 func appendNonDuplicates(targetSlice []string, value string) []string {
