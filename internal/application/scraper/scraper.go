@@ -33,7 +33,6 @@ func (s Scraper) HandleSource(n *html.Node) ([]entity.Recipe, error) {
 
 		if isImage {
 
-			n.Data = strings.TrimSpace(n.Data)
 			n.Data = getImageSrc(n.Data)
 			imageUrls = append(imageUrls, n.Data)
 
@@ -106,6 +105,7 @@ func existsInSlice(slice []string, value string) bool {
 }
 
 func getImageSrc(tag string) string {
+	tag = strings.TrimSpace(tag)
 	var out string = "https:"
 
 	for idx, char := range tag {
