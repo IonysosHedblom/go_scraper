@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
+func (s api) GetQuery(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
@@ -43,7 +43,7 @@ func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
 	w.Write(j)
 }
 
-func (s Api) CallSource(url string) (*html.Node, error) {
+func (s api) CallSource(url string) (*html.Node, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
