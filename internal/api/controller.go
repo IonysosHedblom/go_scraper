@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (s api) GetQuery(w http.ResponseWriter, req *http.Request) {
+func (s api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
@@ -26,7 +26,7 @@ func (s api) GetQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := buildUrl(q[0])
+	url := buildQueryUrl(q[0])
 
 	document, err := s.CallSource(url)
 
@@ -35,12 +35,16 @@ func (s api) GetQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response := s.api.GetQueryCommand(document)
+	response := s.api.GetByQueryHandler(document)
 
 	j, _ := json.Marshal(response)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
+}
+
+func (s api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
+
 }
 
 func (s api) CallSource(url string) (*html.Node, error) {
@@ -62,7 +66,7 @@ func (s api) CallSource(url string) (*html.Node, error) {
 	return doc, nil
 }
 
-func buildUrl(query string) string {
+func buildQueryUrl(query string) string {
 	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
 	return url
 }

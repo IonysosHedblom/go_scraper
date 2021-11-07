@@ -6,5 +6,5 @@ import (
 )
 
 type ApiPort interface {
-	GetQueryCommand(*html.Node) []entity.Recipe
+	GetByQueryHandler(*html.Node) []entity.Recipe
 }

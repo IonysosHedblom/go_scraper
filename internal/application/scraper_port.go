@@ -6,5 +6,5 @@ import (
 )
 
 type ScraperPort interface {
-	GetQueryHandler(src *html.Node) []entity.Recipe
+	GetRecipeResults(src *html.Node) []entity.Recipe
 }
