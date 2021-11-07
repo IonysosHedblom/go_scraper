@@ -5,6 +5,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type ApiPort interface {
+type AppPort interface {
 	GetByQueryHandler(*html.Node) []entity.Recipe
 }

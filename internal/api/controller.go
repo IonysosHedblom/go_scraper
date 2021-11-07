@@ -35,7 +35,7 @@ func (s api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response := s.api.GetByQueryHandler(document)
+	response := s.app.GetByQueryHandler(document)
 
 	j, _ := json.Marshal(response)
 

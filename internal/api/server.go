@@ -9,11 +9,11 @@ import (
 )
 
 type api struct {
-	api domain.ApiPort
+	app domain.AppPort
 }
 
-func NewApi(a domain.ApiPort) *api {
-	return &api{api: a}
+func NewApi(app domain.AppPort) *api {
+	return &api{app: app}
 }
 
 func (a *api) Run() {
