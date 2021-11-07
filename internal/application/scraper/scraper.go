@@ -22,7 +22,7 @@ func (s Scraper) GetQueryHandler(n *html.Node) []entity.Recipe {
 }
 
 func traverseHtml(n *html.Node) (t, d, i []string, ing [][]string) {
-	var imgRegex string = `\n\s+<img src=`
+	const imgRegex string = `\n\s+<img src=`
 	var titles []string
 	var descriptions []string
 	var imageUrls []string
@@ -30,24 +30,19 @@ func traverseHtml(n *html.Node) (t, d, i []string, ing [][]string) {
 	var visitNode func(n *html.Node)
 
 	visitNode = func(n *html.Node) {
-		isTitle := n.Type == html.ElementNode && n.Parent.Data == "h2"
-		isDescription := n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p"
-		isIngredientsList := n.Type == html.ElementNode && n.Parent.Data == "li" && n.Data == "span" && n.Attr[1].Val == "ingredients"
+		isElementNode := n.Type == html.ElementNode
+		isTitle := isElementNode && n.Parent.Data == "h2"
+		isDescription := isElementNode && n.Parent.Data == "a" && n.Data == "p"
+		isIngredientsList := isElementNode && n.Parent.Data == "li" && n.Data == "span" && n.Attr[1].Val == "ingredients"
 		isImage := isRegexMatch(imgRegex, n.Data)
 
 		if isImage {
-
 			n.Data = getImageSrc(n.Data)
 			imageUrls = append(imageUrls, n.Data)
-
 		} else if isTitle {
-
 			titles = appendNonDuplicates(titles, n.FirstChild.Data)
-
 		} else if isDescription {
-
 			descriptions = appendNonDuplicates(descriptions, n.FirstChild.Data)
-
 		} else if isIngredientsList {
 			ingredientsSlice := strings.Split(n.Attr[0].Val, "\n")
 			ingredients = append(ingredients, ingredientsSlice)
@@ -59,7 +54,6 @@ func traverseHtml(n *html.Node) (t, d, i []string, ing [][]string) {
 	}
 
 	forEachNode(n, visitNode, nil)
-
 	return titles, descriptions, imageUrls, ingredients
 }
 
@@ -124,11 +118,21 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	}
 }
 
-func mapSliceValuesToRecipe(titles []string, descriptions []string, imageUrls []string, ingredients [][]string) []entity.Recipe {
+func mapSliceValuesToRecipe(
+	titles,
+	descriptions,
+	imageUrls []string,
+	ingredients [][]string) []entity.Recipe {
+
 	var recipes []entity.Recipe
 
 	for i := 0; i < len(titles); i++ {
-		recipe := &entity.Recipe{Title: titles[i], Description: descriptions[i], ImageUrl: imageUrls[i], Ingredients: ingredients[i]}
+		recipe := &entity.Recipe{
+			Title:       titles[i],
+			Description: descriptions[i],
+			ImageUrl:    imageUrls[i],
+			Ingredients: ingredients[i],
+		}
 		recipes = append(recipes, *recipe)
 	}
 
