@@ -16,12 +16,12 @@ func New() *scraper {
 }
 
 func (s scraper) GetRecipeResults(n *html.Node) []entity.Recipe {
-	titles, descriptions, imageUrls, ingredients := traverseHtml(n)
+	titles, descriptions, imageUrls, ingredients := findRecipeInformation(n)
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
 	return recipes
 }
 
-func traverseHtml(n *html.Node) (t, d, i []string, ing [][]string) {
+func findRecipeInformation(n *html.Node) (t, d, i []string, ing [][]string) {
 	const imgRegex string = `\n\s+<img src=`
 	var titles []string
 	var descriptions []string
