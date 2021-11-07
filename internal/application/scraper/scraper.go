@@ -16,44 +16,46 @@ func New() *Scraper {
 }
 
 var ImgRegex string = `\n\s+<img src=`
-var titles []string
-var descriptions []string
-var imageUrls []string
-var ingredients [][]string
 
 func (s Scraper) HandleSource(n *html.Node) []entity.Recipe {
-	forEachNode(n, s.VisitNode, nil)
+	var titles []string
+	var descriptions []string
+	var imageUrls []string
+	var ingredients [][]string
+	var visitNode func(n *html.Node)
+
+	visitNode = func(n *html.Node) {
+		isTitle := n.Type == html.ElementNode && n.Parent.Data == "h2"
+		isDescription := n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p"
+		isIngredientsList := n.Type == html.ElementNode && n.Parent.Data == "li" && n.Data == "span" && n.Attr[1].Val == "ingredients"
+		isImage := isRegexMatch(ImgRegex, n.Data)
+
+		if isImage {
+
+			n.Data = getImageSrc(n.Data)
+			imageUrls = append(imageUrls, n.Data)
+
+		} else if isTitle {
+
+			titles = appendNonDuplicates(titles, n.FirstChild.Data)
+
+		} else if isDescription {
+
+			descriptions = appendNonDuplicates(descriptions, n.FirstChild.Data)
+
+		} else if isIngredientsList {
+			ingredientsSlice := strings.Split(n.Attr[0].Val, "\n")
+			ingredients = append(ingredients, ingredientsSlice)
+		}
+
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			visitNode(c)
+		}
+	}
+
+	forEachNode(n, visitNode, nil)
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
 	return recipes
-}
-
-func (s Scraper) VisitNode(n *html.Node) {
-	isTitle := n.Type == html.ElementNode && n.Parent.Data == "h2"
-	isDescription := n.Type == html.ElementNode && n.Parent.Data == "a" && n.Data == "p"
-	isIngredientsList := n.Type == html.ElementNode && n.Parent.Data == "li" && n.Data == "span" && n.Attr[1].Val == "ingredients"
-	isImage := isRegexMatch(ImgRegex, n.Data)
-
-	if isImage {
-
-		n.Data = getImageSrc(n.Data)
-		imageUrls = append(imageUrls, n.Data)
-
-	} else if isTitle {
-
-		titles = appendNonDuplicates(titles, n.FirstChild.Data)
-
-	} else if isDescription {
-
-		descriptions = appendNonDuplicates(descriptions, n.FirstChild.Data)
-
-	} else if isIngredientsList {
-		ingredientsSlice := strings.Split(n.Attr[0].Val, "\n")
-		ingredients = append(ingredients, ingredientsSlice)
-	}
-
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		s.VisitNode(c)
-	}
 }
 
 func isRegexMatch(regex string, target string) bool {
