@@ -17,7 +17,13 @@ func New() *Scraper {
 
 var ImgRegex string = `\n\s+<img src=`
 
-func (s Scraper) HandleSource(n *html.Node) []entity.Recipe {
+func (s Scraper) GetQueryHandler(n *html.Node) []entity.Recipe {
+	titles, descriptions, imageUrls, ingredients := traverseHtml(n)
+	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
+	return recipes
+}
+
+func traverseHtml(n *html.Node) (t, d, i []string, ing [][]string) {
 	var titles []string
 	var descriptions []string
 	var imageUrls []string
@@ -54,8 +60,8 @@ func (s Scraper) HandleSource(n *html.Node) []entity.Recipe {
 	}
 
 	forEachNode(n, visitNode, nil)
-	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
-	return recipes
+
+	return titles, descriptions, imageUrls, ingredients
 }
 
 func isRegexMatch(regex string, target string) bool {

@@ -35,7 +35,7 @@ func (s Api) GetQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response := s.api.HandleSource(document)
+	response := s.api.GetQueryCommand(document)
 
 	j, _ := json.Marshal(response)
 

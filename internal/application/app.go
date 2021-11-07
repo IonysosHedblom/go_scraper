@@ -13,8 +13,8 @@ func NewApplication(scraper ScraperPort) *Application {
 	return &Application{scraper: scraper}
 }
 
-func (a Application) HandleSource(src *html.Node) []entity.Recipe {
-	stringSrc := a.scraper.HandleSource(src)
+func (a Application) GetQueryCommand(src *html.Node) []entity.Recipe {
+	stringSrc := a.scraper.GetQueryHandler(src)
 
 	return stringSrc
 }
