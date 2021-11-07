@@ -9,13 +9,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Scraper struct{}
+type scraper struct{}
 
-func New() *Scraper {
-	return &Scraper{}
+func New() *scraper {
+	return &scraper{}
 }
 
-func (s Scraper) GetQueryHandler(n *html.Node) []entity.Recipe {
+func (s scraper) GetQueryHandler(n *html.Node) []entity.Recipe {
 	titles, descriptions, imageUrls, ingredients := traverseHtml(n)
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
 	return recipes
