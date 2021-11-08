@@ -5,14 +5,14 @@ import (
 	"log"
 	"net/http"
 
-	domain "github.com/ionysoshedblom/go_scraper/internal/domain/interfaces"
+	"github.com/ionysoshedblom/go_scraper/internal/domain/abstractions"
 )
 
 type api struct {
-	app domain.AppPort
+	app abstractions.AppPort
 }
 
-func NewApi(app domain.AppPort) *api {
+func NewApi(app abstractions.AppPort) *api {
 	return &api{app: app}
 }
 

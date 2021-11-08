@@ -14,7 +14,7 @@ func (s *api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
 	case "GET":
 		s.GetByQuery(w, req)
 	case "POST":
-		s.GetByIngredients(w, req)
+		s.PostWithIngredients(w, req)
 	default:
 		return
 	}
@@ -50,7 +50,6 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	response := s.app.GetByQueryHandler(document)
 
 	j, _ := json.Marshal(response)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }
@@ -64,7 +63,7 @@ type Ingredients struct {
 	Ingredients []string
 }
 
-func (s *api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
+func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 	var i Ingredients
 	if req.Method != "POST" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
@@ -111,14 +110,14 @@ func (s *api) CallSource(url string) (*html.Node, error) {
 	return doc, nil
 }
 
-var url string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&filter=Ingrediens%3ALinser&num=16&sortbymetadata=Relevance&id=12&_hour=11&filter=Ingrediens%3AAvokado&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
+func buildQueryByIngredients(ingredients []string) string {
+	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=16&sortbymetadata=Relevance&id=12&_hour=11&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
 
-func buildQueryByIngredients(ingredients []string) {
-	var queryString string = ""
-
-	for i := 0; i < len(ingredients)+1; i++ {
-		queryString += "filter=Ingrediens%3ALinser"
+	for i := 0; i < len(ingredients); i++ {
+		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", ingredients[i])
 	}
+	fmt.Println(queryString)
+	return queryString
 }
 
 func buildQueryUrl(query string) string {
