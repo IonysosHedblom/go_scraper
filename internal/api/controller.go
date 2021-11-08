@@ -3,10 +3,22 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"golang.org/x/net/html"
 )
+
+func (s api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "GET":
+		s.GetByQuery(w, req)
+	case "POST":
+		s.GetByIngredients(w, req)
+	default:
+		return
+	}
+}
 
 func (s api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
@@ -43,8 +55,41 @@ func (s api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	w.Write(j)
 }
 
-func (s api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
+type Body struct {
+	Bytes  []byte
+	String string
+}
 
+type Ingredients struct {
+	Ingredients []string
+}
+
+func (s api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
+	var i Ingredients
+	if req.Method != "POST" {
+		http.Error(w, "Wrong method", http.StatusBadRequest)
+		return
+	}
+
+	body, err := ioutil.ReadAll(req.Body)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	defer req.Body.Close()
+
+	if req.Body == nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	json.Unmarshal(body, &i)
+	fmt.Println(i.Ingredients)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(body)
 }
 
 func (s api) CallSource(url string) (*html.Node, error) {

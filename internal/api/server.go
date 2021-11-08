@@ -17,7 +17,7 @@ func NewApi(app domain.AppPort) *api {
 }
 
 func (a *api) Run() {
-	http.HandleFunc("/api/scraper", a.GetByQuery)
+	http.HandleFunc("/api/scraper", a.ScraperRouter)
 	fmt.Println("Server running on port 8080")
 	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
