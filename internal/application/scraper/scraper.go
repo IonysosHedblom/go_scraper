@@ -60,7 +60,7 @@ func findRecipeInformation(n *html.Node) (t, d, i []string, ing [][]string) {
 func isRegexMatch(regex string, target string) bool {
 	rx, err := regexp.Compile(regex)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Print("Could not compile regex", err)
 	}
 
 	match := rx.MatchString(target)
