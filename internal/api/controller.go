@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
 )
 
@@ -47,24 +49,15 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	response := s.app.GetByQueryHandler(document)
+	response := s.app.CallRecipeResultScraping(document)
 
 	j, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }
 
-type Body struct {
-	Bytes  []byte
-	String string
-}
-
-type Ingredients struct {
-	Ingredients []string
-}
-
 func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
-	var i Ingredients
+	var i entity.Ingredients
 	if req.Method != "POST" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
@@ -85,10 +78,18 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 	}
 
 	json.Unmarshal(body, &i)
-	fmt.Println(i.Ingredients)
+	url := buildUrlWithIngredientsQuery(i.Ingredients)
+	document, err := s.CallSource(url)
+
+	if err != nil {
+		http.Error(w, "bad payload", http.StatusBadRequest)
+	}
+
+	response := s.app.CallRecipeResultScraping(document)
+	j, _ := json.Marshal(response)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(body)
+	w.Write(j)
 }
 
 func (s *api) CallSource(url string) (*html.Node, error) {
@@ -110,13 +111,13 @@ func (s *api) CallSource(url string) (*html.Node, error) {
 	return doc, nil
 }
 
-func buildQueryByIngredients(ingredients []string) string {
-	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=16&sortbymetadata=Relevance&id=12&_hour=11&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
+func buildUrlWithIngredientsQuery(ingredients []string) string {
+	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=20&sortbymetadata=Relevance&id=12&_hour=11&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
 
 	for i := 0; i < len(ingredients); i++ {
-		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", ingredients[i])
+		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredients[i]))
 	}
-	fmt.Println(queryString)
+
 	return queryString
 }
 

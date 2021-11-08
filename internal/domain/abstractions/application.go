@@ -6,5 +6,5 @@ import (
 )
 
 type AppPort interface {
-	GetByQueryHandler(*html.Node) []entity.Recipe
+	CallRecipeResultScraping(*html.Node) []entity.Recipe
 }

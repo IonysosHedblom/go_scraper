@@ -14,7 +14,7 @@ func NewApplication(scraper abstractions.ScraperPort) *Application {
 	return &Application{scraper: scraper}
 }
 
-func (a Application) GetByQueryHandler(src *html.Node) []entity.Recipe {
+func (a Application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {
 	stringSrc := a.scraper.GetRecipeResults(src)
 
 	return stringSrc
