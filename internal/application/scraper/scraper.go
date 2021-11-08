@@ -15,7 +15,7 @@ func New() *scraper {
 	return &scraper{}
 }
 
-func (s scraper) GetRecipeResults(n *html.Node) []entity.Recipe {
+func (s *scraper) GetRecipeResults(n *html.Node) []entity.Recipe {
 	titles, descriptions, imageUrls, ingredients := findRecipeInformation(n)
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
 	return recipes

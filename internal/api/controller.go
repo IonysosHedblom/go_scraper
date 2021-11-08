@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (s api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
+func (s *api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		s.GetByQuery(w, req)
@@ -20,7 +20,7 @@ func (s api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (s api) GetByQuery(w http.ResponseWriter, req *http.Request) {
+func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
 		return
@@ -64,7 +64,7 @@ type Ingredients struct {
 	Ingredients []string
 }
 
-func (s api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
+func (s *api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
 	var i Ingredients
 	if req.Method != "POST" {
 		http.Error(w, "Wrong method", http.StatusBadRequest)
@@ -92,7 +92,7 @@ func (s api) GetByIngredients(w http.ResponseWriter, req *http.Request) {
 	w.Write(body)
 }
 
-func (s api) CallSource(url string) (*html.Node, error) {
+func (s *api) CallSource(url string) (*html.Node, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
