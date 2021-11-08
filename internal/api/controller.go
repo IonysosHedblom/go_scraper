@@ -111,6 +111,16 @@ func (s api) CallSource(url string) (*html.Node, error) {
 	return doc, nil
 }
 
+var url string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&filter=Ingrediens%3ALinser&num=16&sortbymetadata=Relevance&id=12&_hour=11&filter=Ingrediens%3AAvokado&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
+
+func buildQueryByIngredients(ingredients []string) {
+	var queryString string = ""
+
+	for i := 0; i < len(ingredients)+1; i++ {
+		queryString += "filter=Ingrediens%3ALinser"
+	}
+}
+
 func buildQueryUrl(query string) string {
 	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
 	return url
