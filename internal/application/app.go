@@ -6,15 +6,15 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Application struct {
+type application struct {
 	scraper abstractions.ScraperPort
 }
 
-func NewApplication(scraper abstractions.ScraperPort) *Application {
-	return &Application{scraper: scraper}
+func NewApplication(scraper abstractions.ScraperPort) *application {
+	return &application{scraper: scraper}
 }
 
-func (a Application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {
+func (a application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {
 	stringSrc := a.scraper.GetRecipeResults(src)
 
 	return stringSrc
