@@ -117,7 +117,7 @@ func buildUrlWithIngredientsQuery(ingredients []string) string {
 	for i := 0; i < len(ingredients); i++ {
 		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredients[i]))
 	}
-
+	fmt.Println(queryString)
 	return queryString
 }
 
