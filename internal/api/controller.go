@@ -114,8 +114,8 @@ func (s *api) CallSource(url string) (*html.Node, error) {
 func buildUrlWithIngredientsQuery(ingredients []string) string {
 	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=20&sortbymetadata=Relevance&id=12&_hour=11&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
 
-	for i := 0; i < len(ingredients); i++ {
-		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredients[i]))
+	for _, ingredient := range ingredients {
+		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredient))
 	}
 	fmt.Println(queryString)
 	return queryString
