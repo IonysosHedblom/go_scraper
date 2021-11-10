@@ -8,10 +8,11 @@ import (
 
 type application struct {
 	scraper abstractions.ScraperPort
+	repo    abstractions.Repository
 }
 
-func NewApplication(scraper abstractions.ScraperPort) *application {
-	return &application{scraper: scraper}
+func NewApplication(scraper abstractions.ScraperPort, repo abstractions.Repository) *application {
+	return &application{scraper: scraper, repo: repo}
 }
 
 func (a application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	_ "github.com/lib/pq"
+
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 )
 
@@ -47,19 +49,23 @@ func (r *repository) GetByQuery(query string) (*entity.PerformedQuery, error) {
 	return pq, nil
 }
 
-func (r *repository) Create(pq *entity.PerformedQuery) error {
+func (r *repository) GetById(id int) (*entity.PerformedQuery, error) {
+	return nil, nil
+}
+
+func (r *repository) Create(query string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := "INSERT INTO performed_queries(id, query) VALUES (?, ?)"
+	dbquery := "INSERT INTO performed_queries(id, query) VALUES (?, ?)"
 
-	statement, err := r.db.PrepareContext(ctx, query)
+	statement, err := r.db.PrepareContext(ctx, dbquery)
 	if err != nil {
 		return err
 	}
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, pq.Id, pq.Query)
+	_, err = statement.ExecContext(ctx, query)
 	return err
 }
