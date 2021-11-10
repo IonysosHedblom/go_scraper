@@ -40,7 +40,7 @@ func (r *repository) GetByQuery(query string) (*entity.PerformedQuery, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := r.db.QueryRowContext(ctx, "SELECT id, query FROM performed_queries WHERE query = ?", query).Scan(&pq.Id, &pq.Query)
+	err := r.db.QueryRowContext(ctx, "SELECT query_id, query FROM performed_queries WHERE query = $1", query).Scan(&pq.Id, &pq.Query)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *repository) Create(query string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbquery := "INSERT INTO performed_queries(id, query) VALUES (?, ?)"
+	dbquery := "INSERT INTO performed_queries(query) VALUES ($1)"
 
 	statement, err := r.db.PrepareContext(ctx, dbquery)
 	if err != nil {
