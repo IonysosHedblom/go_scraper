@@ -14,14 +14,13 @@ func main() {
 	dsn := db.CreateDbDSN()
 	db, err := db.NewDB("postgres", dsn)
 
-	repo := repository.NewRepository(db)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer db.Close()
 
+	repo := repository.NewRepository(db)
 	scraper := scraper.New()
 	application := app.NewApplication(scraper, repo)
 
