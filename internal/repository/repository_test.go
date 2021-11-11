@@ -17,6 +17,7 @@ var performed_query = &entity.PerformedQuery{
 
 func NewRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
+
 	if err != nil {
 		log.Fatalf("an error %s was not expected when opening a stub db connection", err)
 	}
@@ -39,7 +40,7 @@ func TestFindByQuery(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Query).WillReturnRows(rows)
 
-	pq, err := repo.GetByQuery(performed_query.Query)
+	pq, err := repo.GetPerformedQueryByQuery(performed_query.Query)
 	assert.NotNil(t, pq)
 	assert.NoError(t, err)
 }
@@ -59,7 +60,7 @@ func TestFindByQueryError(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Query).WillReturnRows(rows)
 
-	pq, err := repo.GetByQuery(performed_query.Query)
+	pq, err := repo.GetPerformedQueryByQuery(performed_query.Query)
 	assert.Empty(t, pq)
 	assert.Error(t, err)
 }
@@ -79,7 +80,7 @@ func TestFindById(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Id).WillReturnRows(rows)
 
-	pq, err := repo.GetById(performed_query.Id)
+	pq, err := repo.GetPerformedQueryById(performed_query.Id)
 	assert.NotNil(t, pq)
 	assert.NoError(t, err)
 }
@@ -99,7 +100,7 @@ func TestFindByIdError(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Id).WillReturnRows(rows)
 
-	pq, err := repo.GetById(performed_query.Id)
+	pq, err := repo.GetPerformedQueryById(performed_query.Id)
 	assert.Empty(t, pq)
 	assert.Error(t, err)
 }
@@ -118,7 +119,7 @@ func TestCreate(t *testing.T) {
 	preparation := mock.ExpectPrepare(dbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 1))
 
-	err := repo.Create(performed_query.Query)
+	err := repo.CreatePerformedQuery(performed_query.Query)
 
 	assert.NoError(t, err)
 }
@@ -136,6 +137,6 @@ func TestCreateError(t *testing.T) {
 
 	preparation := mock.ExpectPrepare(badDbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 0))
-	err := repo.Create(performed_query.Query)
+	err := repo.CreatePerformedQuery(performed_query.Query)
 	assert.Error(t, err)
 }
