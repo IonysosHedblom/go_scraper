@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/ionysoshedblom/go_scraper/internal/api"
-	app "github.com/ionysoshedblom/go_scraper/internal/application"
+	"github.com/ionysoshedblom/go_scraper/internal/application"
 	"github.com/ionysoshedblom/go_scraper/internal/application/scraper"
 	"github.com/ionysoshedblom/go_scraper/internal/db"
 	"github.com/ionysoshedblom/go_scraper/internal/repository"
@@ -22,8 +22,8 @@ func main() {
 
 	repo := repository.NewRepository(db)
 	scraper := scraper.New()
-	application := app.NewApplication(scraper, repo)
+	app := application.NewApplication(scraper, repo)
 
-	httpServer := api.NewApi(application)
+	httpServer := api.NewApi(app)
 	httpServer.Run()
 }

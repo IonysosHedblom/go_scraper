@@ -1,4 +1,4 @@
-package app
+package application
 
 import (
 	"github.com/ionysoshedblom/go_scraper/internal/domain/abstractions"
