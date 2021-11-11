@@ -1,8 +1,8 @@
 package entity
 
 type Recipe struct {
-	Title       string
-	Description string
-	ImageUrl    string
-	Ingredients []string
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	ImageUrl    string   `json:"image_url"`
+	Ingredients []string `json:"ingredients"`
 }

@@ -18,7 +18,7 @@ func NewPqRepository(db *sql.DB) *performedQueries {
 	}
 }
 
-func (r *performedQueries) GetPerformedQueryByQuery(query string) (*entity.PerformedQuery, error) {
+func (r *performedQueries) GetByQuery(query string) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -33,7 +33,7 @@ func (r *performedQueries) GetPerformedQueryByQuery(query string) (*entity.Perfo
 	return pq, nil
 }
 
-func (r *performedQueries) GetPerformedQueryById(id int) (*entity.PerformedQuery, error) {
+func (r *performedQueries) GetById(id int) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -48,7 +48,7 @@ func (r *performedQueries) GetPerformedQueryById(id int) (*entity.PerformedQuery
 	return pq, nil
 }
 
-func (r *performedQueries) CreatePerformedQuery(query string) error {
+func (r *performedQueries) Create(query string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

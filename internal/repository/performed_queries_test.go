@@ -15,7 +15,7 @@ var performed_query = &entity.PerformedQuery{
 	Query: "pasta",
 }
 
-func NewRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
+func NewPqRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
 
 	if err != nil {
@@ -26,7 +26,7 @@ func NewRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
 }
 
 func TestFindByQuery(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -40,13 +40,13 @@ func TestFindByQuery(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Query).WillReturnRows(rows)
 
-	pq, err := repo.GetPerformedQueryByQuery(performed_query.Query)
+	pq, err := repo.GetByQuery(performed_query.Query)
 	assert.NotNil(t, pq)
 	assert.NoError(t, err)
 }
 
 func TestFindByQueryError(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -60,13 +60,13 @@ func TestFindByQueryError(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Query).WillReturnRows(rows)
 
-	pq, err := repo.GetPerformedQueryByQuery(performed_query.Query)
+	pq, err := repo.GetByQuery(performed_query.Query)
 	assert.Empty(t, pq)
 	assert.Error(t, err)
 }
 
 func TestFindById(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -80,13 +80,13 @@ func TestFindById(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Id).WillReturnRows(rows)
 
-	pq, err := repo.GetPerformedQueryById(performed_query.Id)
+	pq, err := repo.GetById(performed_query.Id)
 	assert.NotNil(t, pq)
 	assert.NoError(t, err)
 }
 
 func TestFindByIdError(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -100,13 +100,13 @@ func TestFindByIdError(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(performed_query.Id).WillReturnRows(rows)
 
-	pq, err := repo.GetPerformedQueryById(performed_query.Id)
+	pq, err := repo.GetById(performed_query.Id)
 	assert.Empty(t, pq)
 	assert.Error(t, err)
 }
 
 func TestCreate(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -119,13 +119,13 @@ func TestCreate(t *testing.T) {
 	preparation := mock.ExpectPrepare(dbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 1))
 
-	err := repo.CreatePerformedQuery(performed_query.Query)
+	err := repo.Create(performed_query.Query)
 
 	assert.NoError(t, err)
 }
 
 func TestCreateError(t *testing.T) {
-	db, mock := NewRepositoryMock()
+	db, mock := NewPqRepositoryMock()
 
 	repo := &performedQueries{db}
 
@@ -137,6 +137,6 @@ func TestCreateError(t *testing.T) {
 
 	preparation := mock.ExpectPrepare(badDbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 0))
-	err := repo.CreatePerformedQuery(performed_query.Query)
+	err := repo.Create(performed_query.Query)
 	assert.Error(t, err)
 }
