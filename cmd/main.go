@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/ionysoshedblom/go_scraper/internal/api"
@@ -20,7 +19,7 @@ func main() {
 	}
 
 	defer repo.Close()
-	fmt.Println(repo)
+
 	scraper := scraper.New()
 	application := app.NewApplication(scraper, repo)
 
