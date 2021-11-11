@@ -28,7 +28,7 @@ func NewRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
 func TestFindByQuery(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()
@@ -48,7 +48,7 @@ func TestFindByQuery(t *testing.T) {
 func TestFindByQueryError(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()
@@ -68,7 +68,7 @@ func TestFindByQueryError(t *testing.T) {
 func TestFindById(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()
@@ -88,7 +88,7 @@ func TestFindById(t *testing.T) {
 func TestFindByIdError(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()
@@ -108,7 +108,7 @@ func TestFindByIdError(t *testing.T) {
 func TestCreate(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()
@@ -127,7 +127,7 @@ func TestCreate(t *testing.T) {
 func TestCreateError(t *testing.T) {
 	db, mock := NewRepositoryMock()
 
-	repo := &repository{db}
+	repo := &performedQueries{db}
 
 	defer func() {
 		repo.db.Close()

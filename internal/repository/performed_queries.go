@@ -2,12 +2,23 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 )
 
-func (r *repository) GetPerformedQueryByQuery(query string) (*entity.PerformedQuery, error) {
+type performedQueries struct {
+	db *sql.DB
+}
+
+func NewPqRepository(db *sql.DB) *performedQueries {
+	return &performedQueries{
+		db: db,
+	}
+}
+
+func (r *performedQueries) GetPerformedQueryByQuery(query string) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -22,7 +33,7 @@ func (r *repository) GetPerformedQueryByQuery(query string) (*entity.PerformedQu
 	return pq, nil
 }
 
-func (r *repository) GetPerformedQueryById(id int) (*entity.PerformedQuery, error) {
+func (r *performedQueries) GetPerformedQueryById(id int) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -37,7 +48,7 @@ func (r *repository) GetPerformedQueryById(id int) (*entity.PerformedQuery, erro
 	return pq, nil
 }
 
-func (r *repository) CreatePerformedQuery(query string) error {
+func (r *performedQueries) CreatePerformedQuery(query string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

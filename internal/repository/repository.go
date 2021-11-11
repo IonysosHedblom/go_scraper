@@ -3,29 +3,15 @@ package repository
 import (
 	"database/sql"
 
-	_ "github.com/lib/pq"
+	"github.com/ionysoshedblom/go_scraper/internal/domain/abstractions"
 )
 
-type repository struct {
-	db *sql.DB
+type Repository struct {
+	PerformedQueries abstractions.PerformedQueriesRepository
 }
 
-func NewRepository(dialect, dsn string) (*repository, error) {
-	db, err := sql.Open(dialect, dsn)
-
-	if err != nil {
-		return nil, err
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{
+		PerformedQueries: NewPqRepository(db),
 	}
-
-	err = db.Ping()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &repository{db}, nil
-}
-
-func (r *repository) Close() {
-	r.db.Close()
 }
