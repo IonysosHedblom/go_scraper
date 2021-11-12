@@ -9,7 +9,7 @@ import (
 func TestExistsInSlice(t *testing.T) {
 	testSlice := []string{"test1", "test2", "test2"}
 	testValue := "test3"
-	expected := true
+	expected := false
 	actual := existsInSlice(testSlice, testValue)
 
 	assert.Equal(t, expected, actual)
