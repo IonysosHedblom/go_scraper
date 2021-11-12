@@ -7,10 +7,20 @@ import (
 )
 
 func TestExistsInSlice(t *testing.T) {
-	testSlice := []string{"test", "test1"}
+	testSlice := []string{"test1", "test2", "test2"}
 	testValue := "test3"
 	expected := true
 	actual := existsInSlice(testSlice, testValue)
+
+	assert.Equal(t, expected, actual)
+}
+
+func TestAppendNonDuplicates(t *testing.T) {
+	testSlice := []string{"test", "test1", "test2"}
+	testValue := "test2"
+
+	expected := []string{"test", "test1", "test2"}
+	actual := appendNonDuplicates(testSlice, testValue)
 
 	assert.Equal(t, expected, actual)
 }
