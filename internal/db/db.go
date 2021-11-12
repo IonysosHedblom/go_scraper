@@ -1,6 +1,10 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/lib/pq"
+)
 
 func NewDB(dialect, dsn string) (*sql.DB, error) {
 	db, err := sql.Open(dialect, dsn)

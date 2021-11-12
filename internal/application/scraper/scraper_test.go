@@ -24,3 +24,7 @@ func TestAppendNonDuplicates(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+// func TestGetImageSrc(t *testing.T) {
+// 	imageInputSrc :=
+// }
