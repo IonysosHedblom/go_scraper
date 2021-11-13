@@ -8,17 +8,17 @@ import (
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 )
 
-type performedQueries struct {
+type performedQueriesStore struct {
 	db *sql.DB
 }
 
-func NewPerformedQueriesStore(db *sql.DB) *performedQueries {
-	return &performedQueries{
+func NewPerformedQueriesStore(db *sql.DB) *performedQueriesStore {
+	return &performedQueriesStore{
 		db: db,
 	}
 }
 
-func (r *performedQueries) GetByQuery(query string) (*entity.PerformedQuery, error) {
+func (r *performedQueriesStore) GetByQuery(query string) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -33,7 +33,7 @@ func (r *performedQueries) GetByQuery(query string) (*entity.PerformedQuery, err
 	return pq, nil
 }
 
-func (r *performedQueries) GetById(id int) (*entity.PerformedQuery, error) {
+func (r *performedQueriesStore) GetById(id int) (*entity.PerformedQuery, error) {
 	pq := new(entity.PerformedQuery)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -48,7 +48,7 @@ func (r *performedQueries) GetById(id int) (*entity.PerformedQuery, error) {
 	return pq, nil
 }
 
-func (r *performedQueries) Create(query string) error {
+func (r *performedQueriesStore) Create(query string) (*int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -56,11 +56,22 @@ func (r *performedQueries) Create(query string) error {
 
 	statement, err := r.db.PrepareContext(ctx, dbquery)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, query)
-	return err
+	res, err := statement.ExecContext(ctx, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	queryId, err := res.LastInsertId()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &queryId, nil
 }

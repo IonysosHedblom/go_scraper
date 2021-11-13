@@ -28,6 +28,8 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	var recipes []entity.Recipe
+
 	queries := req.URL.Query()
 	if len(queries) > 1 {
 		http.Error(w, "too many queries", http.StatusBadRequest)
@@ -40,18 +42,63 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := buildQueryUrl(q[0])
-
-	document, err := s.CallSource(url)
+	performedQueryInDb, err := s.app.GetPerformedQuery(q[0])
 
 	if err != nil {
-		http.Error(w, "bad payload", http.StatusBadRequest)
+		http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
+		fmt.Println(err)
 		return
 	}
 
-	response := s.app.CallRecipeResultScraping(document)
+	if performedQueryInDb == nil {
+		url := buildQueryUrl(q[0])
+		document, err := s.CallSource(url)
 
-	j, _ := json.Marshal(response)
+		if err != nil {
+			http.Error(w, "bad payload", http.StatusBadRequest)
+			return
+		}
+
+		recipes = s.app.CallRecipeResultScraping(document)
+
+		queryId, err := s.app.CreateNewPerformedQuery(q[0])
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+
+		for _, r := range recipes {
+			recipe := &entity.Recipe{
+				Title:       r.Title,
+				Description: r.Description,
+				ImageUrl:    r.ImageUrl,
+				Ingredients: r.Ingredients,
+				QueryId:     *queryId,
+			}
+			err = s.app.CreateNewRecipe(recipe)
+		}
+
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+	} else {
+
+	}
+
+	// url := buildQueryUrl(q[0])
+	// document, err := s.CallSource(url)
+
+	// if err != nil {
+	// 	http.Error(w, "bad payload", http.StatusBadRequest)
+	// 	return
+	// }
+
+	// response := s.app.CallRecipeResultScraping(document)
+
+	j, _ := json.Marshal(recipes)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }

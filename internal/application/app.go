@@ -21,3 +21,37 @@ func (a application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {
 
 	return stringSrc
 }
+
+func (a application) GetPerformedQuery(query string) (*entity.PerformedQuery, error) {
+	pq, err := a.repo.PerformedQueriesStore.GetByQuery(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pq, nil
+}
+
+func (a application) CreateNewPerformedQuery(query string) (*int64, error) {
+	_, err := a.repo.PerformedQueriesStore.Create(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func (a application) CreateNewRecipe(recipe *entity.Recipe) error {
+	err := a.repo.RecipeStore.Create(recipe)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a application) GetAllRecipesByQueryId(id int64) ([]entity.Recipe, error) {
+	return nil, nil
+}

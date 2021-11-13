@@ -28,7 +28,7 @@ func NewPqRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
 func TestFindByQuery(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -48,7 +48,7 @@ func TestFindByQuery(t *testing.T) {
 func TestFindByQueryError(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -68,7 +68,7 @@ func TestFindByQueryError(t *testing.T) {
 func TestFindById(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -88,7 +88,7 @@ func TestFindById(t *testing.T) {
 func TestFindByIdError(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -108,7 +108,7 @@ func TestFindByIdError(t *testing.T) {
 func TestCreate(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -119,7 +119,7 @@ func TestCreate(t *testing.T) {
 	preparation := mock.ExpectPrepare(dbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 1))
 
-	err := repo.Create(performed_query.Query)
+	_, err := repo.Create(performed_query.Query)
 
 	assert.NoError(t, err)
 }
@@ -127,7 +127,7 @@ func TestCreate(t *testing.T) {
 func TestCreateError(t *testing.T) {
 	db, mock := NewPqRepositoryMock()
 
-	repo := &performedQueries{db}
+	repo := &performedQueriesStore{db}
 
 	defer func() {
 		repo.db.Close()
@@ -137,6 +137,6 @@ func TestCreateError(t *testing.T) {
 
 	preparation := mock.ExpectPrepare(badDbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 0))
-	err := repo.Create(performed_query.Query)
+	_, err := repo.Create(performed_query.Query)
 	assert.Error(t, err)
 }

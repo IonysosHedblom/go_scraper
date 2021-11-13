@@ -6,25 +6,29 @@ import (
 	"time"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
+	"github.com/lib/pq"
 )
 
-type recipes struct {
+type recipeStore struct {
 	db *sql.DB
 }
 
-func NewRecipeStore(db *sql.DB) *recipes {
-	return &recipes{
+func NewRecipeStore(db *sql.DB) *recipeStore {
+	return &recipeStore{
 		db: db,
 	}
 }
 
-func (r *recipes) GetByQueryId(id int) (*entity.Recipe, error) {
+func (r *recipeStore) GetByQueryId(id int) (*[]entity.Recipe, error) {
+	var recipes *[]entity.Recipe
 	recipe := new(entity.Recipe)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := r.db.QueryRowContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id).Scan(&recipe.Title, &recipe.Description, &recipe.ImageUrl, &recipe.Ingredients)
+	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id)
+
+	// for rows.Next() {}
 
 	if err != nil {
 		return nil, err
@@ -33,7 +37,7 @@ func (r *recipes) GetByQueryId(id int) (*entity.Recipe, error) {
 	return recipe, nil
 }
 
-func (r *recipes) Create(recipe *entity.Recipe) error {
+func (r *recipeStore) Create(recipe *entity.Recipe) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -46,6 +50,6 @@ func (r *recipes) Create(recipe *entity.Recipe) error {
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, recipe.Title, recipe.Description, recipe.ImageUrl, recipe.Ingredients)
+	_, err = statement.ExecContext(ctx, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients))
 	return err
 }

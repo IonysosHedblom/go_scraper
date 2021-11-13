@@ -5,4 +5,5 @@ type Recipe struct {
 	Description string   `json:"description"`
 	ImageUrl    string   `json:"imageurl"`
 	Ingredients []string `json:"ingredients"`
+	QueryId     int64    `json:"query_id"`
 }
