@@ -7,11 +7,13 @@ import (
 )
 
 type Repository struct {
-	PerformedQueries abstractions.PerformedQueriesRepository
+	PerformedQueriesStore abstractions.PerformedQueriesStore
+	RecipeStore           abstractions.RecipeStore
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		PerformedQueries: NewPqRepository(db),
+		PerformedQueriesStore: NewPerformedQueriesStore(db),
+		RecipeStore:           NewRecipeStore(db),
 	}
 }

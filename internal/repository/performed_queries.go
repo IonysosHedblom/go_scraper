@@ -12,7 +12,7 @@ type performedQueries struct {
 	db *sql.DB
 }
 
-func NewPqRepository(db *sql.DB) *performedQueries {
+func NewPerformedQueriesStore(db *sql.DB) *performedQueries {
 	return &performedQueries{
 		db: db,
 	}
