@@ -44,9 +44,9 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 	performedQueryInDb, err := s.app.GetPerformedQuery(q[0])
 
-	if err != nil {
+	if err != nil && err.Error() != "sql: no rows in result set" {
 		http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
-		fmt.Println(err)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -61,7 +61,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 		recipes = s.app.CallRecipeResultScraping(document)
 
-		queryId, err := s.app.CreateNewPerformedQuery(q[0])
+		newQueryId, err := s.app.CreateNewPerformedQuery(q[0])
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusBadRequest)
 			fmt.Println(err)
@@ -74,18 +74,24 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 				Description: r.Description,
 				ImageUrl:    r.ImageUrl,
 				Ingredients: r.Ingredients,
-				QueryId:     *queryId,
+				QueryId:     *newQueryId,
 			}
 			err = s.app.CreateNewRecipe(recipe)
 		}
 
 		if err != nil {
-			http.Error(w, "error with db conn", http.StatusBadRequest)
+			http.Error(w, "error with db conn", http.StatusInternalServerError)
 			fmt.Println(err)
 			return
 		}
-	} else {
 
+	} else {
+		recipes, err = s.app.GetRecipesByQueryId(int64(performedQueryInDb.Id))
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusInternalServerError)
+			fmt.Println(err)
+			return
+		}
 	}
 
 	// url := buildQueryUrl(q[0])

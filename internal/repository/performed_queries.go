@@ -52,7 +52,7 @@ func (r *performedQueriesStore) Create(query string) (*int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbquery := "INSERT INTO performed_queries (query) VALUES ($1)"
+	dbquery := "INSERT INTO performed_queries (query) VALUES ($1) RETURNING query_id"
 
 	statement, err := r.db.PrepareContext(ctx, dbquery)
 	if err != nil {

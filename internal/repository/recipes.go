@@ -19,22 +19,28 @@ func NewRecipeStore(db *sql.DB) *recipeStore {
 	}
 }
 
-func (r *recipeStore) GetByQueryId(id int) (*[]entity.Recipe, error) {
-	var recipes *[]entity.Recipe
-	recipe := new(entity.Recipe)
+func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
+	var recipes []entity.Recipe
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id)
 
-	// for rows.Next() {}
+	for rows.Next() {
+		recipe := new(entity.Recipe)
+		err := rows.Scan(&recipe.Title, &recipe.Description, &recipe.ImageUrl, &recipe.Ingredients)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, *recipe)
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return recipe, nil
+	return recipes, nil
 }
 
 func (r *recipeStore) Create(recipe *entity.Recipe) error {

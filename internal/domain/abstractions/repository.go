@@ -11,6 +11,6 @@ type PerformedQueriesStore interface {
 }
 
 type RecipeStore interface {
-	GetByQueryId(id int64) (*[]entity.Recipe, error)
+	GetByQueryId(id int64) ([]entity.Recipe, error)
 	Create(recipe *entity.Recipe) error
 }

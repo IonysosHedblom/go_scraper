@@ -52,6 +52,12 @@ func (a application) CreateNewRecipe(recipe *entity.Recipe) error {
 	return nil
 }
 
-func (a application) GetAllRecipesByQueryId(id int64) ([]entity.Recipe, error) {
-	return nil, nil
+func (a application) GetRecipesByQueryId(id int64) ([]entity.Recipe, error) {
+	recipes, err := a.repo.RecipeStore.GetByQueryId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipes, nil
 }
