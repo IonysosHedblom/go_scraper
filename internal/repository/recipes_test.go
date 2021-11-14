@@ -95,10 +95,10 @@ func TestCreate(t *testing.T) {
 		repo.db.Close()
 	}()
 
-	dbQuery := "INSERT INTO recipes \\(title, description, imageurl, ingredients, query_id\\) VALUES \\(\\$1, \\$2, \\$3, \\$4, \\$5\\)"
+	dbQuery := "INSERT INTO recipes \\(recipe_id, title, description, imageurl, ingredients, query_id\\) VALUES \\(\\$1, \\$2, \\$3, \\$4, \\$5\\)"
 
 	prep := mock.ExpectPrepare(dbQuery)
-	prep.ExpectExec().WithArgs(recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId).WillReturnResult(sqlmock.NewResult(0, 1))
+	prep.ExpectExec().WithArgs(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId).WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := repo.Create(recipe)
 	assert.NoError(t, err)

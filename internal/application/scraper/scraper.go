@@ -3,6 +3,7 @@ package scraper
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
@@ -15,14 +16,21 @@ func New() *scraper {
 	return &scraper{}
 }
 
-func (s *scraper) GetRecipeResults(n *html.Node) []entity.Recipe {
-	titles, descriptions, imageUrls, ingredients := findRecipeInformation(n)
-	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, ingredients)
-	return recipes
+func (s *scraper) GetRecipeResults(n *html.Node) ([]entity.Recipe, error) {
+	titles, descriptions, imageUrls, recipeIds, ingredients := findRecipeInformation(n)
+
+	int64RecipeIds, err := mapIdsToInt64(recipeIds)
+	if err != nil {
+		return nil, err
+	}
+
+	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, int64RecipeIds, ingredients)
+	return recipes, nil
 }
 
-func findRecipeInformation(n *html.Node) (t, d, i []string, ing [][]string) {
+func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) {
 	const imgRegex string = `\n\s+<img src=`
+	var recipeIds []string
 	var titles []string
 	var descriptions []string
 	var imageUrls []string
@@ -41,6 +49,7 @@ func findRecipeInformation(n *html.Node) (t, d, i []string, ing [][]string) {
 			imageUrls = append(imageUrls, n.Data)
 		} else if isTitle {
 			titles = appendNonDuplicates(titles, n.FirstChild.Data)
+			recipeIds = appendNonDuplicates(recipeIds, n.Attr[2].Val)
 		} else if isDescription {
 			descriptions = appendNonDuplicates(descriptions, n.FirstChild.Data)
 		} else if isIngredientsList {
@@ -54,7 +63,7 @@ func findRecipeInformation(n *html.Node) (t, d, i []string, ing [][]string) {
 	}
 
 	forEachNode(n, visitNode, nil)
-	return titles, descriptions, imageUrls, ingredients
+	return titles, descriptions, imageUrls, recipeIds, ingredients
 }
 
 func isRegexMatch(regex string, target string) bool {
@@ -122,12 +131,14 @@ func mapSliceValuesToRecipe(
 	titles,
 	descriptions,
 	imageUrls []string,
+	recipeIds []int64,
 	ingredients [][]string) []entity.Recipe {
 
 	var recipes []entity.Recipe
 
 	for i := 0; i < len(titles); i++ {
 		recipe := &entity.Recipe{
+			Id:          recipeIds[i],
 			Title:       titles[i],
 			Description: descriptions[i],
 			ImageUrl:    imageUrls[i],
@@ -137,4 +148,29 @@ func mapSliceValuesToRecipe(
 	}
 
 	return recipes
+}
+
+func convertStringToInt64(str string) (*int64, error) {
+	if n, err := strconv.Atoi(str); err == nil {
+		n64 := int64(n)
+		return &n64, nil
+	} else {
+		return nil, err
+	}
+}
+
+func mapIdsToInt64(idSlice []string) ([]int64, error) {
+	var int64Slice []int64
+
+	for _, str := range idSlice {
+		num, err := convertStringToInt64(str)
+		if err != nil {
+			fmt.Println("String is not convertible to int64")
+			return nil, err
+		}
+
+		int64Slice = append(int64Slice, *num)
+	}
+
+	return int64Slice, nil
 }

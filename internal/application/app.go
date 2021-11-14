@@ -16,10 +16,14 @@ func NewApplication(scraper abstractions.ScraperPort, repo *repository.Repositor
 	return &application{scraper: scraper, repo: repo}
 }
 
-func (a application) CallRecipeResultScraping(src *html.Node) []entity.Recipe {
-	stringSrc := a.scraper.GetRecipeResults(src)
+func (a application) CallRecipeResultScraping(src *html.Node) ([]entity.Recipe, error) {
+	stringSrc, err := a.scraper.GetRecipeResults(src)
 
-	return stringSrc
+	if err != nil {
+		return nil, err
+	}
+
+	return stringSrc, nil
 }
 
 func (a application) GetPerformedQuery(query string) (*entity.PerformedQuery, error) {

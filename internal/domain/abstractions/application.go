@@ -6,7 +6,7 @@ import (
 )
 
 type AppPort interface {
-	CallRecipeResultScraping(*html.Node) []entity.Recipe
+	CallRecipeResultScraping(*html.Node) ([]entity.Recipe, error)
 	GetPerformedQuery(query string) (*entity.PerformedQuery, error)
 	CreateNewPerformedQuery(query string) (*int64, error)
 	CreateNewRecipe(recipe *entity.Recipe) error

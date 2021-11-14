@@ -53,7 +53,12 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		recipes = s.app.CallRecipeResultScraping(document)
+		recipes, err = s.app.CallRecipeResultScraping(document)
+
+		if err != nil {
+			http.Error(w, "error scraping recipe ids", http.StatusInternalServerError)
+			return
+		}
 
 		newQueryId, err := s.app.CreateNewPerformedQuery(q[0])
 		if err != nil {
@@ -63,6 +68,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 		for _, r := range recipes {
 			recipe := &entity.Recipe{
+				Id:          r.Id,
 				Title:       r.Title,
 				Description: r.Description,
 				ImageUrl:    r.ImageUrl,
@@ -119,9 +125,15 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		http.Error(w, "bad payload", http.StatusBadRequest)
+		return
 	}
 
-	response := s.app.CallRecipeResultScraping(document)
+	response, err := s.app.CallRecipeResultScraping(document)
+
+	if err != nil {
+		http.Error(w, "error with recipeids", http.StatusBadRequest)
+	}
+
 	j, _ := json.Marshal(response)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -148,7 +160,7 @@ func (s *api) CallSource(url string) (*html.Node, error) {
 }
 
 func buildUrlWithIngredientsQuery(ingredients []string) string {
-	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=20&sortbymetadata=Relevance&id=12&_hour=11&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
+	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=20&sortbymetadata=Relevance&id=12&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
 
 	for _, ingredient := range ingredients {
 		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredient))
