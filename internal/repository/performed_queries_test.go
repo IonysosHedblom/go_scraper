@@ -114,14 +114,15 @@ func TestCreate(t *testing.T) {
 		repo.db.Close()
 	}()
 
-	dbQuery := "INSERT INTO performed_queries \\(query\\) VALUES \\(\\$1\\)"
+	dbQuery := "INSERT INTO performed_queries \\(query\\) VALUES \\(\\$1\\) RETURNING query_id"
 
 	preparation := mock.ExpectPrepare(dbQuery)
-	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 1))
+	preparation.ExpectQuery().WithArgs(performed_query.Query)
 
-	_, err := repo.Create(performed_query.Query)
+	queryId, err := repo.Create(performed_query.Query)
 
 	assert.NoError(t, err)
+	assert.NotNil(t, queryId)
 }
 
 func TestCreateError(t *testing.T) {

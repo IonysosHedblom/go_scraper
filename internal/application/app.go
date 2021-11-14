@@ -33,13 +33,13 @@ func (a application) GetPerformedQuery(query string) (*entity.PerformedQuery, er
 }
 
 func (a application) CreateNewPerformedQuery(query string) (*int64, error) {
-	_, err := a.repo.PerformedQueriesStore.Create(query)
+	queryId, err := a.repo.PerformedQueriesStore.Create(query)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return queryId, nil
 }
 
 func (a application) CreateNewRecipe(recipe *entity.Recipe) error {
