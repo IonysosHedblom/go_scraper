@@ -12,7 +12,7 @@ import (
 
 var performed_query = &entity.PerformedQuery{
 	Id:    1,
-	Query: "pasta",
+	Query: "testQuery",
 }
 
 func NewPqRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
@@ -103,26 +103,6 @@ func TestFindByIdError(t *testing.T) {
 	pq, err := repo.GetById(performed_query.Id)
 	assert.Empty(t, pq)
 	assert.Error(t, err)
-}
-
-func TestCreate(t *testing.T) {
-	db, mock := NewPqRepositoryMock()
-
-	repo := &performedQueriesStore{db}
-
-	defer func() {
-		repo.db.Close()
-	}()
-
-	dbQuery := "INSERT INTO performed_queries \\(query\\) VALUES \\(\\$1\\) RETURNING query_id"
-	rows := sqlmock.NewRows([]string{"query_id", "query"}).AddRow(performed_query.Id, performed_query.Query)
-	preparation := mock.ExpectPrepare(dbQuery)
-	preparation.ExpectQuery().WithArgs(performed_query.Id, performed_query.Query).WillReturnRows(rows)
-
-	queryId, err := repo.Create(performed_query.Query)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, queryId)
 }
 
 func TestCreateError(t *testing.T) {
