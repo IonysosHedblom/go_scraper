@@ -27,6 +27,12 @@ func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 
 	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id)
 
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		recipe := new(entity.Recipe)
 		err := rows.Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId)

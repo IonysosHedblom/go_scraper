@@ -81,7 +81,6 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusInternalServerError)
-			fmt.Println(err)
 			return
 		}
 
@@ -89,12 +88,14 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		recipes, err = s.app.GetRecipesByQueryId(int64(performedQueryInDb.Id))
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusInternalServerError)
-			fmt.Println(err)
 			return
 		}
 	}
 
-	j, _ := json.Marshal(recipes)
+	j, err := json.Marshal(recipes)
+	if err != nil {
+		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }
