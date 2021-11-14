@@ -23,22 +23,17 @@ func (s *api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" {
-		http.Error(w, "Wrong method", http.StatusBadRequest)
-		return
-	}
-
 	var recipes []entity.Recipe
 
 	queries := req.URL.Query()
-	if len(queries) > 1 {
-		http.Error(w, "too many queries", http.StatusBadRequest)
+	if len(queries) != 1 {
+		http.Error(w, "bad query param", http.StatusBadRequest)
 		return
 	}
 
 	q := queries["query"]
-	if len(q) > 1 {
-		http.Error(w, "too many queries", http.StatusBadRequest)
+	if len(q) != 1 {
+		http.Error(w, "bad query param", http.StatusBadRequest)
 		return
 	}
 
@@ -46,7 +41,6 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
-		fmt.Println(err.Error())
 		return
 	}
 
@@ -64,7 +58,6 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		newQueryId, err := s.app.CreateNewPerformedQuery(q[0])
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusBadRequest)
-			fmt.Println(err)
 			return
 		}
 
@@ -93,19 +86,17 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	}
 
 	j, err := json.Marshal(recipes)
+
 	if err != nil {
 		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }
 
 func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 	var i entity.Ingredients
-	if req.Method != "POST" {
-		http.Error(w, "Wrong method", http.StatusBadRequest)
-		return
-	}
 
 	body, err := ioutil.ReadAll(req.Body)
 
@@ -116,7 +107,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
 
-	if req.Body == nil {
+	if req.Body == http.NoBody {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
