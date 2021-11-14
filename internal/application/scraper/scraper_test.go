@@ -43,8 +43,8 @@ func TestMapSliceValuesToRecipe(t *testing.T) {
 	recipeIds := []int64{1, 2, 3}
 
 	expected := []entity.Recipe{
-		{Title: titles[0], Description: descriptions[0], ImageUrl: imageUrls[0], Ingredients: ingredients[0]},
-		{Title: titles[1], Description: descriptions[1], ImageUrl: imageUrls[1], Ingredients: ingredients[1]},
+		{Id: recipeIds[0], Title: titles[0], Description: descriptions[0], ImageUrl: imageUrls[0], Ingredients: ingredients[0]},
+		{Id: recipeIds[1], Title: titles[1], Description: descriptions[1], ImageUrl: imageUrls[1], Ingredients: ingredients[1]},
 	}
 	actual := mapSliceValuesToRecipe(titles, descriptions, imageUrls, recipeIds, ingredients)
 
