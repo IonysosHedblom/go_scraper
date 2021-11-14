@@ -54,13 +54,13 @@ func (r *performedQueriesStore) Create(query string) (*int64, error) {
 
 	var queryId int64
 	dbquery := "INSERT INTO performed_queries (query) VALUES ($1) RETURNING query_id"
-	stmt, err := r.db.PrepareContext(ctx, dbquery)
+	// stmt, err := r.db.PrepareContext(ctx, dbquery)
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	stmt.QueryRowContext(ctx, dbquery, query).Scan(&queryId)
+	err := r.db.QueryRowContext(ctx, dbquery, query).Scan(&queryId)
 
 	if err != nil {
 		return nil, err
