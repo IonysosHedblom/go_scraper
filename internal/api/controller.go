@@ -94,16 +94,6 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	// url := buildQueryUrl(q[0])
-	// document, err := s.CallSource(url)
-
-	// if err != nil {
-	// 	http.Error(w, "bad payload", http.StatusBadRequest)
-	// 	return
-	// }
-
-	// response := s.app.CallRecipeResultScraping(document)
-
 	j, _ := json.Marshal(recipes)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)

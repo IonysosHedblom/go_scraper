@@ -29,7 +29,7 @@ func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 
 	for rows.Next() {
 		recipe := new(entity.Recipe)
-		err := rows.Scan(&recipe.Title, &recipe.Description, &recipe.ImageUrl, &recipe.Ingredients)
+		err := rows.Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId)
 		if err != nil {
 			return nil, err
 		}
@@ -47,7 +47,7 @@ func (r *recipeStore) Create(recipe *entity.Recipe) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbQuery := "INSERT INTO recipes (title, description, imageurl, ingredients) VALUES ($1, $2, $3, $4)"
+	dbQuery := "INSERT INTO recipes (title, description, imageurl, ingredients, query_id) VALUES ($1, $2, $3, $4, $5)"
 	statement, err := r.db.PrepareContext(ctx, dbQuery)
 
 	if err != nil {
@@ -56,6 +56,6 @@ func (r *recipeStore) Create(recipe *entity.Recipe) error {
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients))
+	_, err = statement.ExecContext(ctx, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId)
 	return err
 }

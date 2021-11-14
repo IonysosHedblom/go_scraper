@@ -1,6 +1,7 @@
 package entity
 
 type Recipe struct {
+	Id          int64    `json:"recipe_id"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	ImageUrl    string   `json:"imageurl"`

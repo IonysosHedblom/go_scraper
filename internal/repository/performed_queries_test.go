@@ -115,9 +115,9 @@ func TestCreate(t *testing.T) {
 	}()
 
 	dbQuery := "INSERT INTO performed_queries \\(query\\) VALUES \\(\\$1\\) RETURNING query_id"
-
+	rows := sqlmock.NewRows([]string{"query_id", "query"}).AddRow(performed_query.Id, performed_query.Query)
 	preparation := mock.ExpectPrepare(dbQuery)
-	preparation.ExpectQuery().WithArgs(performed_query.Query)
+	preparation.ExpectQuery().WithArgs(performed_query.Id, performed_query.Query).WillReturnRows(rows)
 
 	queryId, err := repo.Create(performed_query.Query)
 
