@@ -89,6 +89,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
