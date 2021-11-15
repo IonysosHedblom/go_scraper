@@ -1,5 +1,5 @@
 package entity
 
-type Ingredients struct {
+type ScraperRequest struct {
 	Ingredients []string
 }

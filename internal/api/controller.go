@@ -103,7 +103,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
-	var i entity.Ingredients
+	var i entity.ScraperRequest
 
 	body, err := ioutil.ReadAll(req.Body)
 
