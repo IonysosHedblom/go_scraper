@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
@@ -27,7 +26,6 @@ func (i *ingredientSearchesStore) GetByIngredients(ingredients []string) (*entit
 	err := i.db.QueryRowContext(ctx, "SELECT ingredient_search_id, ingredients FROM ingredient_searches WHERE ingredients @> $1 AND ingredients <@ $1", pq.Array(ingredients)).Scan(&ingredientSearch.Id, pq.Array(&ingredientSearch.Ingredients))
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -47,14 +45,12 @@ func (i *ingredientSearchesStore) Create(ingredients []string) (*int64, error) {
 	stmt, err := i.db.PrepareContext(ctx, dbquery)
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
 	err = stmt.QueryRowContext(ctx, pq.Array(ingredients)).Scan(&id)
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
