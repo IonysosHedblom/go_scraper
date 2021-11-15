@@ -11,10 +11,13 @@ type PerformedQueriesStore interface {
 }
 
 type RecipeStore interface {
+	GetById(id int64) (*entity.Recipe, error)
 	GetByQueryId(id int64) ([]entity.Recipe, error)
 	GetByIngredientSearchId(id int64) ([]entity.Recipe, error)
 	Create(recipe *entity.Recipe) error
 	CreateFromIngredients(recipe *entity.Recipe) error
+	UpdateIngredientSearchId(ingredientSearchId *int64, recipeId int64) error
+	UpdateQueryId(queryId *int64, recipeId int64) error
 }
 
 type IngredientSearchesStore interface {

@@ -19,10 +19,25 @@ func NewRecipeStore(db *sql.DB) *recipeStore {
 	}
 }
 
+func (r *recipeStore) GetById(id int64) (*entity.Recipe, error) {
+	recipe := new(entity.Recipe)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := r.db.QueryRowContext(ctx, "SELECT * FROM recipes WHERE recipe_id = $1", id).Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId, &recipe.IngredientSearchId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipe, nil
+}
+
 func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 	var recipes []entity.Recipe
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id)
@@ -112,5 +127,43 @@ func (r *recipeStore) CreateFromIngredients(recipe *entity.Recipe) error {
 	defer statement.Close()
 
 	_, err = statement.ExecContext(ctx, recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), *recipe.IngredientSearchId)
+	return err
+}
+
+func (r *recipeStore) UpdateIngredientSearchId(ingredientSearchId *int64, recipeId int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbQuery := "UPDATE recipes SET ingredient_search_id = $1 WHERE recipe_id = $2"
+
+	statement, err := r.db.PrepareContext(ctx, dbQuery)
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	_, err = statement.ExecContext(ctx, *ingredientSearchId, recipeId)
+
+	return err
+}
+
+func (r *recipeStore) UpdateQueryId(queryId *int64, recipeId int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbQuery := "UPDATE recipes SET query_id = $1 WHERE recipe_id = $2"
+
+	statement, err := r.db.PrepareContext(ctx, dbQuery)
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	_, err = statement.ExecContext(ctx, *queryId, recipeId)
+
 	return err
 }

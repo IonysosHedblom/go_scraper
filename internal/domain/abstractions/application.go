@@ -11,6 +11,7 @@ type AppPort interface {
 	CreateNewPerformedQuery(query string) (*int64, error)
 	CreateNewRecipe(recipe *entity.Recipe) error
 	CreateNewRecipeFromIngredients(recipe *entity.Recipe) error
+	GetRecipeById(id int64) (*entity.Recipe, error)
 	GetRecipesByQueryId(id int64) ([]entity.Recipe, error)
 	GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, error)
 	GetIngredientSearch(ingredients []string) (*entity.IngredientSearch, error)

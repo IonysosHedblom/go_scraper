@@ -66,8 +66,28 @@ func (a application) CreateNewRecipeFromIngredients(recipe *entity.Recipe) error
 	return nil
 }
 
+func (a application) GetRecipeById(id int64) (*entity.Recipe, error) {
+	recipe, err := a.repo.RecipeStore.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipe, nil
+}
+
 func (a application) GetRecipesByQueryId(id int64) ([]entity.Recipe, error) {
 	recipes, err := a.repo.RecipeStore.GetByQueryId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipes, nil
+}
+
+func (a application) GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, error) {
+	recipes, err := a.repo.RecipeStore.GetByIngredientSearchId(id)
 
 	if err != nil {
 		return nil, err
@@ -94,14 +114,4 @@ func (a application) CreateIngredientSearch(ingredients []string) (*int64, error
 	}
 
 	return id, err
-}
-
-func (a application) GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, error) {
-	recipes, err := a.repo.RecipeStore.GetByIngredientSearchId(id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return recipes, nil
 }
