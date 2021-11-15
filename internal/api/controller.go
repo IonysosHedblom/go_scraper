@@ -103,6 +103,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
+	var recipes []entity.Recipe
 	var i entity.ScraperRequest
 
 	body, err := ioutil.ReadAll(req.Body)
@@ -120,21 +121,70 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 	}
 
 	json.Unmarshal(body, &i)
-	url := buildUrlWithIngredientsQuery(i.Ingredients)
-	document, err := s.CallSource(url)
 
-	if err != nil {
-		http.Error(w, "bad payload", http.StatusBadRequest)
+	ingredientSearchInDb, err := s.app.GetIngredientSearch(i.Ingredients)
+
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		http.Error(w, "error getting ingredient search from db", http.StatusInternalServerError)
 		return
 	}
 
-	response, err := s.app.CallRecipeResultScraping(document)
+	if ingredientSearchInDb == nil {
+		url := buildUrlWithIngredientsQuery(i.Ingredients)
+		document, err := s.CallSource(url)
 
-	if err != nil {
-		http.Error(w, "error with recipeids", http.StatusBadRequest)
+		if err != nil {
+			http.Error(w, "bad payload", http.StatusBadRequest)
+			return
+		}
+
+		recipes, err = s.app.CallRecipeResultScraping(document)
+
+		if err != nil {
+			http.Error(w, "error scraping recipe ids", http.StatusInternalServerError)
+			return
+		}
+
+		newIngredientSearchId, err := s.app.CreateIngredientSearch(i.Ingredients)
+
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusBadRequest)
+			return
+		}
+
+		for _, r := range recipes {
+			recipe := &entity.Recipe{
+				Id:                 r.Id,
+				Title:              r.Title,
+				Description:        r.Description,
+				ImageUrl:           r.ImageUrl,
+				Ingredients:        r.Ingredients,
+				IngredientSearchId: *newIngredientSearchId,
+			}
+			err = s.app.CreateNewRecipeFromIngredients(recipe)
+		}
+
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	j, _ := json.Marshal(response)
+	// url := buildUrlWithIngredientsQuery(i.Ingredients)
+	// document, err := s.CallSource(url)
+
+	// if err != nil {
+	// 	http.Error(w, "bad payload", http.StatusBadRequest)
+	// 	return
+	// }
+
+	// response, err := s.app.CallRecipeResultScraping(document)
+
+	// if err != nil {
+	// 	http.Error(w, "error with recipeids", http.StatusBadRequest)
+	// }
+
+	j, _ := json.Marshal(recipes)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
