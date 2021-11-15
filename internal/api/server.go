@@ -5,15 +5,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ionysoshedblom/go_scraper/internal/application/handlers"
 	"github.com/ionysoshedblom/go_scraper/internal/domain/abstractions"
 )
 
 type api struct {
-	app abstractions.AppPort
+	app      abstractions.AppPort
+	handlers *handlers.Handlers
 }
 
-func NewApi(app abstractions.AppPort) *api {
-	return &api{app: app}
+func NewApi(app abstractions.AppPort, handlers *handlers.Handlers) *api {
+	return &api{app: app, handlers: handlers}
 }
 
 func (a *api) Run() {

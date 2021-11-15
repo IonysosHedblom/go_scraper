@@ -37,7 +37,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	performedQueryInDb, err := s.app.GetPerformedQuery(q[0])
+	performedQueryInDb, err := s.handlers.PqHandler.GetPerformedQuery(q[0])
 
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
@@ -60,14 +60,14 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		newQueryId, err := s.app.CreateNewPerformedQuery(q[0])
+		newQueryId, err := s.handlers.PqHandler.CreateNewPerformedQuery(q[0])
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusBadRequest)
 			return
 		}
 
 		for _, r := range recipes {
-			recipeInDb, err := s.app.GetRecipeById(r.Id)
+			recipeInDb, err := s.handlers.RecipeHandler.GetRecipeById(r.Id)
 
 			if err != nil && err.Error() != "sql: no rows in result set" {
 				http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
@@ -83,14 +83,14 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 					Ingredients: r.Ingredients,
 					QueryId:     newQueryId,
 				}
-				err := s.app.CreateNewRecipe(recipe)
+				err := s.handlers.RecipeHandler.CreateNewRecipe(recipe)
 
 				if err != nil {
 					http.Error(w, "error creating new recipe", http.StatusInternalServerError)
 					return
 				}
 			} else {
-				err := s.app.UpdateRecipeQueryId(newQueryId, r.Id)
+				err := s.handlers.RecipeHandler.UpdateRecipeQueryId(newQueryId, r.Id)
 				if err != nil {
 					http.Error(w, "error updating recipe", http.StatusInternalServerError)
 					return
@@ -98,7 +98,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 	} else {
-		recipes, err = s.app.GetRecipesByQueryId(int64(performedQueryInDb.Id))
+		recipes, err = s.handlers.RecipeHandler.GetRecipesByQueryId(int64(performedQueryInDb.Id))
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusInternalServerError)
 			return
@@ -136,7 +136,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 
 	json.Unmarshal(body, &i)
 
-	ingredientSearchInDb, err := s.app.GetIngredientSearch(i.Ingredients)
+	ingredientSearchInDb, err := s.handlers.IngredientSearchHandler.GetIngredientSearch(i.Ingredients)
 
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		http.Error(w, "error getting ingredient search from db", http.StatusInternalServerError)
@@ -159,7 +159,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		newIngredientSearchId, err := s.app.CreateIngredientSearch(i.Ingredients)
+		newIngredientSearchId, err := s.handlers.IngredientSearchHandler.CreateIngredientSearch(i.Ingredients)
 
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusBadRequest)
@@ -175,7 +175,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 				Ingredients:        r.Ingredients,
 				IngredientSearchId: newIngredientSearchId,
 			}
-			err = s.app.CreateNewRecipeFromIngredients(recipe)
+			err = s.handlers.RecipeHandler.CreateNewRecipeFromIngredients(recipe)
 		}
 
 		if err != nil {
@@ -183,7 +183,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	} else {
-		recipes, err = s.app.GetRecipesByIngredientSearchId(int64(ingredientSearchInDb.Id))
+		recipes, err = s.handlers.RecipeHandler.GetRecipesByIngredientSearchId(int64(ingredientSearchInDb.Id))
 		if err != nil {
 			http.Error(w, "error with db conn", http.StatusInternalServerError)
 			return
