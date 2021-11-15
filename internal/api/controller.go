@@ -73,7 +73,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 				Description: r.Description,
 				ImageUrl:    r.ImageUrl,
 				Ingredients: r.Ingredients,
-				QueryId:     *newQueryId,
+				QueryId:     newQueryId,
 			}
 			err = s.app.CreateNewRecipe(recipe)
 		}
@@ -159,7 +159,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 				Description:        r.Description,
 				ImageUrl:           r.ImageUrl,
 				Ingredients:        r.Ingredients,
-				IngredientSearchId: *newIngredientSearchId,
+				IngredientSearchId: newIngredientSearchId,
 			}
 			err = s.app.CreateNewRecipeFromIngredients(recipe)
 		}
@@ -168,23 +168,20 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, "error with db conn", http.StatusInternalServerError)
 			return
 		}
+	} else {
+		recipes, err = s.app.GetRecipesByIngredientSearchId(int64(ingredientSearchInDb.Id))
+		if err != nil {
+			http.Error(w, "error with db conn", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	// url := buildUrlWithIngredientsQuery(i.Ingredients)
-	// document, err := s.CallSource(url)
+	j, err := json.Marshal(recipes)
 
-	// if err != nil {
-	// 	http.Error(w, "bad payload", http.StatusBadRequest)
-	// 	return
-	// }
-
-	// response, err := s.app.CallRecipeResultScraping(document)
-
-	// if err != nil {
-	// 	http.Error(w, "error with recipeids", http.StatusBadRequest)
-	// }
-
-	j, _ := json.Marshal(recipes)
+	if err != nil {
+		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)

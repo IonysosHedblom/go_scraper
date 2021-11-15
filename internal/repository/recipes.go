@@ -22,7 +22,7 @@ func NewRecipeStore(db *sql.DB) *recipeStore {
 func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 	var recipes []entity.Recipe
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
 	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE query_id = $1", id)
@@ -35,7 +35,37 @@ func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 
 	for rows.Next() {
 		recipe := new(entity.Recipe)
-		err := rows.Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId)
+		err := rows.Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId, &recipe.IngredientSearchId)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, *recipe)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipes, nil
+}
+
+func (r *recipeStore) GetByIngredientSearchId(id int64) ([]entity.Recipe, error) {
+	var recipes []entity.Recipe
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := r.db.QueryContext(ctx, "SELECT * FROM recipes WHERE ingredient_search_id = $1", id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		recipe := new(entity.Recipe)
+		err := rows.Scan(&recipe.Id, &recipe.Title, &recipe.Description, &recipe.ImageUrl, pq.Array(&recipe.Ingredients), &recipe.QueryId, &recipe.IngredientSearchId)
 		if err != nil {
 			return nil, err
 		}
@@ -53,12 +83,8 @@ func (r *recipeStore) Create(recipe *entity.Recipe) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var dbQuery string
-	if recipe.QueryId > 0 {
-		dbQuery = "INSERT INTO recipes (recipe_id, title, description, imageurl, ingredients, query_id) VALUES ($1, $2, $3, $4, $5, $6)"
-	} else {
-		dbQuery = "INSERT INTO recipes (recipe_id, title, description, imageurl, ingredients, ingredient_search_id) VALUES ($1, $2, $3, $4, $5, $6)"
-	}
+	dbQuery := "INSERT INTO recipes (recipe_id, title, description, imageurl, ingredients, query_id) VALUES ($1, $2, $3, $4, $5, $6)"
+
 	statement, err := r.db.PrepareContext(ctx, dbQuery)
 
 	if err != nil {
@@ -67,7 +93,7 @@ func (r *recipeStore) Create(recipe *entity.Recipe) error {
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId)
+	_, err = statement.ExecContext(ctx, recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), *recipe.QueryId)
 	return err
 }
 
@@ -85,6 +111,6 @@ func (r *recipeStore) CreateFromIngredients(recipe *entity.Recipe) error {
 
 	defer statement.Close()
 
-	_, err = statement.ExecContext(ctx, recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.IngredientSearchId)
+	_, err = statement.ExecContext(ctx, recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), *recipe.IngredientSearchId)
 	return err
 }

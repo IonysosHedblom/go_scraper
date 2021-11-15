@@ -21,10 +21,10 @@ func NewIngredientSearchStore(db *sql.DB) *ingredientSearchesStore {
 func (i *ingredientSearchesStore) GetByIngredients(ingredients []string) (*entity.IngredientSearch, error) {
 	ingredientSearch := new(entity.IngredientSearch)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := i.db.QueryRowContext(ctx, "SELECT ingredient_search_id, ingredients FROM ingredient_searches WHERE ingredients @> $1 AND ingredients <@ $1", pq.Array(ingredients)).Scan(&ingredientSearch.Id, &ingredientSearch.Ingredients)
+	err := i.db.QueryRowContext(ctx, "SELECT ingredient_search_id, ingredients FROM ingredient_searches WHERE ingredients @> $1 AND ingredients <@ $1", pq.Array(ingredients)).Scan(&ingredientSearch.Id, pq.Array(&ingredientSearch.Ingredients))
 
 	if err != nil {
 		fmt.Println(err)

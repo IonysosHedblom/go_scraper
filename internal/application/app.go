@@ -95,3 +95,13 @@ func (a application) CreateIngredientSearch(ingredients []string) (*int64, error
 
 	return id, err
 }
+
+func (a application) GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, error) {
+	recipes, err := a.repo.RecipeStore.GetByIngredientSearchId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return recipes, nil
+}

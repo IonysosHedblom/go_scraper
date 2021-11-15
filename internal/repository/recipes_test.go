@@ -11,13 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var qid int64 = 5
+
 var recipe = &entity.Recipe{
 	Id:          5,
 	Title:       "test",
 	Description: "testDesc",
 	ImageUrl:    "https://testimgurl.jpg",
 	Ingredients: []string{"test1", "test2"},
-	QueryId:     5,
+	QueryId:     &qid,
 }
 
 func NewRecipeRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
@@ -53,7 +55,7 @@ func TestGetByQueryId(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(recipe.QueryId).WillReturnRows(rows)
 
-	res, err := repo.GetByQueryId(recipe.QueryId)
+	res, err := repo.GetByQueryId(*recipe.QueryId)
 	assert.NotNil(t, res)
 	assert.NoError(t, err)
 }
@@ -81,7 +83,7 @@ func TestGetByQueryIdError(t *testing.T) {
 
 	mock.ExpectQuery(dbQuery).WithArgs(recipe.QueryId).WillReturnRows(rows)
 
-	res, err := repo.GetByQueryId(recipe.QueryId)
+	res, err := repo.GetByQueryId(*recipe.QueryId)
 	assert.Empty(t, res)
 	assert.Error(t, err)
 }
