@@ -15,8 +15,8 @@ type RecipeStore interface {
 	Create(recipe *entity.Recipe) error
 }
 
-type ingredientSearchesStore interface {
-	GetByQuery(query string) (*entity.PerformedQuery, error)
-	GetById(id int) (*entity.PerformedQuery, error)
-	Create(query string) (*int64, error)
+type IngredientSearchesStore interface {
+	GetByIngredients(ingredients []string) (*entity.IngredientSearch, error)
+	GetById(id int) (*entity.IngredientSearch, error)
+	Create(ingredients []string) (*int64, error)
 }
