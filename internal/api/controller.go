@@ -67,22 +67,36 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 		}
 
 		for _, r := range recipes {
-			recipe := &entity.Recipe{
-				Id:          r.Id,
-				Title:       r.Title,
-				Description: r.Description,
-				ImageUrl:    r.ImageUrl,
-				Ingredients: r.Ingredients,
-				QueryId:     newQueryId,
+			recipeInDb, err := s.app.GetRecipeById(r.Id)
+
+			if err != nil && err.Error() != "sql: no rows in result set" {
+				http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
+				return
 			}
-			err = s.app.CreateNewRecipe(recipe)
-		}
 
-		if err != nil {
-			http.Error(w, "error with db conn", http.StatusInternalServerError)
-			return
-		}
+			if recipeInDb == nil {
+				recipe := &entity.Recipe{
+					Id:          r.Id,
+					Title:       r.Title,
+					Description: r.Description,
+					ImageUrl:    r.ImageUrl,
+					Ingredients: r.Ingredients,
+					QueryId:     newQueryId,
+				}
+				err := s.app.CreateNewRecipe(recipe)
 
+				if err != nil {
+					http.Error(w, "error creating new recipe", http.StatusInternalServerError)
+					return
+				}
+			} else {
+				err := s.app.UpdateRecipeQueryId(newQueryId, r.Id)
+				if err != nil {
+					http.Error(w, "error updating recipe", http.StatusInternalServerError)
+					return
+				}
+			}
+		}
 	} else {
 		recipes, err = s.app.GetRecipesByQueryId(int64(performedQueryInDb.Id))
 		if err != nil {

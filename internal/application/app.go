@@ -96,6 +96,22 @@ func (a application) GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, 
 	return recipes, nil
 }
 
+func (a application) UpdateRecipeIngredientSearchId(ingredientSearchId *int64, recipeId int64) error {
+	if err := a.repo.RecipeStore.UpdateIngredientSearchId(ingredientSearchId, recipeId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a application) UpdateRecipeQueryId(queryId *int64, recipeId int64) error {
+	if err := a.repo.RecipeStore.UpdateQueryId(queryId, recipeId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (a application) GetIngredientSearch(ingredients []string) (*entity.IngredientSearch, error) {
 	ingS, err := a.repo.IngredientSearchesStore.GetByIngredients(ingredients)
 
