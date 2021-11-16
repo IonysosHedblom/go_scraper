@@ -1,9 +1,6 @@
 package scraper
 
 import (
-	"fmt"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
@@ -26,6 +23,11 @@ func (s *scraper) GetRecipeResults(n *html.Node) ([]entity.Recipe, error) {
 
 	recipes := mapSliceValuesToRecipe(titles, descriptions, imageUrls, int64RecipeIds, ingredients)
 	return recipes, nil
+}
+
+func (s *scraper) GetRecipeDetails(n *html.Node) (u, i, c []string) {
+	units, ingredients, checklist := findRecipeDetails(n)
+	return units, ingredients, checklist
 }
 
 func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) {
@@ -66,51 +68,33 @@ func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) 
 	return titles, descriptions, imageUrls, recipeIds, ingredients
 }
 
-func isRegexMatch(regex string, target string) bool {
-	rx, err := regexp.Compile(regex)
-	if err != nil {
-		fmt.Print("Could not compile regex", err)
-	}
+func findRecipeDetails(n *html.Node) (u, i, c []string) {
+	var units []string
+	var ingredients []string
+	var checklist []string
 
-	match := rx.MatchString(target)
+	var visitNode func(n *html.Node)
+	visitNode = func(n *html.Node) {
+		isElementNode := n.Type == html.ElementNode
+		isUnit := isElementNode && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__qty"
+		isIngredient := isElementNode && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__ingr"
+		isChecklist := isElementNode && n.Data == "div" && n.Attr[0].Val == "cooking-steps-main__text"
 
-	return match
-}
-
-func getImageSrc(tag string) string {
-	tag = strings.TrimSpace(tag)
-	var out string = "https:"
-
-	for idx, char := range tag {
-		if string(char) == `"` && idx > 10 {
-			return out
+		if isUnit {
+			units = append(units, n.FirstChild.Data)
+		} else if isIngredient {
+			ingredients = append(ingredients, n.FirstChild.Data)
+		} else if isChecklist {
+			checklist = append(checklist, n.FirstChild.Data)
 		}
 
-		if idx > 9 {
-			out += string(char)
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			visitNode(c)
 		}
 	}
 
-	return out
-}
-
-func appendNonDuplicates(targetSlice []string, value string) []string {
-	stringExists := existsInSlice(targetSlice, value)
-
-	if !stringExists {
-		targetSlice = append(targetSlice, value)
-	}
-
-	return targetSlice
-}
-
-func existsInSlice(slice []string, value string) bool {
-	for _, b := range slice {
-		if b == value {
-			return true
-		}
-	}
-	return false
+	forEachNode(n, visitNode, nil)
+	return units, ingredients, checklist
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
@@ -125,52 +109,4 @@ func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
 	if post != nil {
 		post(n)
 	}
-}
-
-func mapSliceValuesToRecipe(
-	titles,
-	descriptions,
-	imageUrls []string,
-	recipeIds []int64,
-	ingredients [][]string) []entity.Recipe {
-
-	var recipes []entity.Recipe
-
-	for i := 0; i < len(titles); i++ {
-		recipe := &entity.Recipe{
-			Id:          recipeIds[i],
-			Title:       titles[i],
-			Description: descriptions[i],
-			ImageUrl:    imageUrls[i],
-			Ingredients: ingredients[i],
-		}
-		recipes = append(recipes, *recipe)
-	}
-
-	return recipes
-}
-
-func convertStringToInt64(str string) (*int64, error) {
-	if n, err := strconv.Atoi(str); err == nil {
-		n64 := int64(n)
-		return &n64, nil
-	} else {
-		return nil, err
-	}
-}
-
-func mapIdsToInt64(idSlice []string) ([]int64, error) {
-	var int64Slice []int64
-
-	for _, str := range idSlice {
-		num, err := convertStringToInt64(str)
-		if err != nil {
-			fmt.Println("String is not convertible to int64")
-			return nil, err
-		}
-
-		int64Slice = append(int64Slice, *num)
-	}
-
-	return int64Slice, nil
 }
