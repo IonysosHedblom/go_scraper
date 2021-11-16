@@ -252,6 +252,7 @@ func buildUrlWithIngredientsQuery(ingredients []string) string {
 }
 
 func buildQueryUrl(query string) string {
+	query = strings.ReplaceAll(query, " ", "+")
 	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
 	return url
 }
