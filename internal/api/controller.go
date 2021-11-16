@@ -175,7 +175,6 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 			}
 
 			if recipeInDb == nil {
-
 				recipe := &entity.Recipe{
 					Id:                 r.Id,
 					Title:              r.Title,
