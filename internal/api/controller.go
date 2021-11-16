@@ -186,7 +186,7 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 				err := s.handlers.RecipeHandler.CreateNewRecipeFromIngredients(recipe)
 
 				if err != nil {
-					http.Error(w, "error updating recipe", http.StatusInternalServerError)
+					http.Error(w, "error creating recipe", http.StatusInternalServerError)
 					return
 				}
 			} else {
@@ -196,11 +196,6 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 					return
 				}
 			}
-		}
-
-		if err != nil {
-			http.Error(w, "error with db conn", http.StatusInternalServerError)
-			return
 		}
 	} else {
 		recipes, err = s.handlers.RecipeHandler.GetRecipesByIngredientSearchId(int64(ingredientSearchInDb.Id))
