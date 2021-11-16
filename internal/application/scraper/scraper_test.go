@@ -50,3 +50,19 @@ func TestMapSliceValuesToRecipe(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+func TestIsRegexMatch(t *testing.T) {
+	tests := []struct {
+		regex  string
+		target string
+		match  bool
+	}{
+		{`\n\s+<img src=`, "\n       <img src=\"//assets.icanet.se/halstrad_tonfisk_med_avokadohummus.jpg\" />\n", true},
+		{`\n\s+<img src=`, "assets.icanet.se/halstrad_tonfisk_med_avokadohummus.jpg\" />\n", false},
+	}
+
+	for _, test := range tests {
+		actual := isRegexMatch(test.regex, test.target)
+		assert.Equal(t, test.match, actual)
+	}
+}
