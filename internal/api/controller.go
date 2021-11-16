@@ -167,15 +167,36 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 		}
 
 		for _, r := range recipes {
-			recipe := &entity.Recipe{
-				Id:                 r.Id,
-				Title:              r.Title,
-				Description:        r.Description,
-				ImageUrl:           r.ImageUrl,
-				Ingredients:        r.Ingredients,
-				IngredientSearchId: newIngredientSearchId,
+			recipeInDb, err := s.handlers.RecipeHandler.GetRecipeById(r.Id)
+
+			if err != nil && err.Error() != "sql: no rows in result set" {
+				http.Error(w, "error getting performed query from db", http.StatusInternalServerError)
+				return
 			}
-			err = s.handlers.RecipeHandler.CreateNewRecipeFromIngredients(recipe)
+
+			if recipeInDb == nil {
+
+				recipe := &entity.Recipe{
+					Id:                 r.Id,
+					Title:              r.Title,
+					Description:        r.Description,
+					ImageUrl:           r.ImageUrl,
+					Ingredients:        r.Ingredients,
+					IngredientSearchId: newIngredientSearchId,
+				}
+				err := s.handlers.RecipeHandler.CreateNewRecipeFromIngredients(recipe)
+
+				if err != nil {
+					http.Error(w, "error updating recipe", http.StatusInternalServerError)
+					return
+				}
+			} else {
+				err := s.handlers.RecipeHandler.UpdateRecipeIngredientSearchId(newIngredientSearchId, r.Id)
+				if err != nil {
+					http.Error(w, "error updating recipe", http.StatusInternalServerError)
+					return
+				}
+			}
 		}
 
 		if err != nil {
