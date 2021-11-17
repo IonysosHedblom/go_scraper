@@ -38,14 +38,14 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 
 	recipeDetails := s.app.CallRecipeDetailsScraping(document)
 
-	recipeAsInt64, err := shared.ConvertStringToInt64(recipeId)
+	recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
 
 	if err != nil {
 		http.Error(w, "cant convert string to int64", http.StatusInternalServerError)
 		return
 	}
 
-	err = s.handlers.RecipeHandler.UpdateIngredientsAndChecklist(recipeDetails.Ingredients, recipeDetails.Checklist, *recipeAsInt64)
+	err = s.handlers.RecipeHandler.UpdateIngredientsAndChecklist(recipeDetails.Ingredients, recipeDetails.Checklist, *recipeIdAsInt64)
 
 	if err != nil {
 		http.Error(w, "db error updating ingredients and checklist", http.StatusInternalServerError)
