@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -40,5 +41,16 @@ func buildUrlWithIngredientsQuery(ingredients []string) string {
 func buildQueryUrl(query string) string {
 	query = strings.ReplaceAll(query, " ", "+")
 	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
+	return url
+}
+
+func buildRecipePageUrl(title string, id int64) string {
+	title = strings.ReplaceAll(title, " ", "-")
+	title = strings.ReplaceAll(title, "ä", "a")
+	title = strings.ReplaceAll(title, "ö", "o")
+	title = strings.ReplaceAll(title, "å", "a")
+
+	url := fmt.Sprintf("https://www.ica.se/recept/%s-%s", title, strconv.Itoa(int(id)))
+
 	return url
 }
