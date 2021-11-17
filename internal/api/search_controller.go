@@ -2,27 +2,25 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
-	"golang.org/x/net/html"
 )
 
 func (s *api) ScraperRouter(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		s.GetByQuery(w, req)
+		s.Get(w, req)
 	case "POST":
-		s.PostWithIngredients(w, req)
+		s.Post(w, req)
 	default:
+		http.Error(w, "No support for this method", http.StatusMethodNotAllowed)
 		return
 	}
 }
 
-func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
+func (s *api) Get(w http.ResponseWriter, req *http.Request) {
 	var recipes []entity.Recipe
 
 	queries := req.URL.Query()
@@ -116,7 +114,7 @@ func (s *api) GetByQuery(w http.ResponseWriter, req *http.Request) {
 	w.Write(j)
 }
 
-func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
+func (s *api) Post(w http.ResponseWriter, req *http.Request) {
 	var recipes []entity.Recipe
 	var i entity.ScraperRequest
 
@@ -214,39 +212,4 @@ func (s *api) PostWithIngredients(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
-}
-
-func (s *api) CallSource(url string) (*html.Node, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("getting %s: %s", url, res.Status)
-	}
-
-	doc, err := html.Parse(res.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
-	}
-
-	return doc, nil
-}
-
-func buildUrlWithIngredientsQuery(ingredients []string) string {
-	var queryString string = "https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&num=20&sortbymetadata=Relevance&id=12&mdsarowentityid=ca2947b2-0c0b-4936-b300-a42700eb2734"
-
-	for _, ingredient := range ingredients {
-		queryString += fmt.Sprintf("&filter=Ingrediens%%3A%v", strings.Title(ingredient))
-	}
-
-	return queryString
-}
-
-func buildQueryUrl(query string) string {
-	query = strings.ReplaceAll(query, " ", "+")
-	url := fmt.Sprintf("https://www.ica.se/Templates/ajaxresponse.aspx?ajaxFunction=RecipeListMdsa&mdsarowentityid=&num=16&query=%s&sortbymetadata=Relevance&id=12", query)
-	return url
 }
