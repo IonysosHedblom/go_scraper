@@ -25,9 +25,24 @@ func (s *scraper) GetRecipeResults(n *html.Node) ([]entity.Recipe, error) {
 	return recipes, nil
 }
 
-func (s *scraper) GetRecipeDetails(n *html.Node) (u, i, c []string) {
-	units, ingredients, checklist := findRecipeDetails(n)
-	return units, ingredients, checklist
+func (s *scraper) GetRecipeDetails(n *html.Node) entity.RecipeDetails {
+	u, i, c := findRecipeDetails(n)
+	recipeDetails := mapDetailsToStruct(u, i, c)
+	return recipeDetails
+}
+
+func mapDetailsToStruct(units, ingredients, checklist []string) entity.RecipeDetails {
+	var recipeDetails entity.RecipeDetails
+	var combinedUnitAndIngredient []string
+
+	for i := 0; i < len(ingredients); i++ {
+		combinedUnitAndIngredient = append(combinedUnitAndIngredient, ingredients[i]+" "+units[i])
+	}
+
+	recipeDetails.Ingredients = combinedUnitAndIngredient
+	recipeDetails.Checklist = checklist
+
+	return recipeDetails
 }
 
 func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) {

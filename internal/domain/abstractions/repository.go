@@ -18,6 +18,7 @@ type RecipeStore interface {
 	CreateFromIngredients(recipe *entity.Recipe) error
 	UpdateIngredientSearchId(ingredientSearchId *int64, recipeId int64) error
 	UpdateQueryId(queryId *int64, recipeId int64) error
+	UpdateIngredientsAndChecklist(ingredients, checklist []string, recipeId int64) error
 }
 
 type IngredientSearchesStore interface {

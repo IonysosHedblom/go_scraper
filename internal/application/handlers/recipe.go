@@ -78,3 +78,11 @@ func (rh *recipeHandler) UpdateRecipeQueryId(queryId *int64, recipeId int64) err
 
 	return nil
 }
+
+func (rh *recipeHandler) UpdateIngredientsAndChecklist(ingredients, checklist []string, recipeId int64) error {
+	if err := rh.repo.RecipeStore.UpdateIngredientsAndChecklist(ingredients, checklist, recipeId); err != nil {
+		return err
+	}
+
+	return nil
+}

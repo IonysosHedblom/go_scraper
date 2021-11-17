@@ -9,3 +9,8 @@ type Recipe struct {
 	QueryId            *int64   `json:"query_id"`
 	IngredientSearchId *int64   `json:"ingredient_search_id"`
 }
+
+type RecipeDetails struct {
+	Ingredients []string
+	Checklist   []string
+}

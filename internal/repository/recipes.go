@@ -130,6 +130,24 @@ func (r *recipeStore) CreateFromIngredients(recipe *entity.Recipe) error {
 	return err
 }
 
+func (r *recipeStore) UpdateIngredientsAndChecklist(ingredients, checklist []string, recipeId int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbQuery := "UPDATE recipes SET ingredients = $1, checklist = $2 WHERE recipe_id = $3"
+	statement, err := r.db.PrepareContext(ctx, dbQuery)
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	_, err = statement.ExecContext(ctx, pq.Array(ingredients), pq.Array(checklist), recipeId)
+
+	return err
+}
+
 func (r *recipeStore) UpdateIngredientSearchId(ingredientSearchId *int64, recipeId int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

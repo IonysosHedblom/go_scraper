@@ -7,5 +7,5 @@ import (
 
 type ScraperPort interface {
 	GetRecipeResults(src *html.Node) ([]entity.Recipe, error)
-	GetRecipeDetails(n *html.Node) (u, i, c []string)
+	GetRecipeDetails(n *html.Node) entity.RecipeDetails
 }

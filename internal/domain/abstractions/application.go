@@ -7,4 +7,5 @@ import (
 
 type AppPort interface {
 	CallRecipeResultScraping(*html.Node) ([]entity.Recipe, error)
+	CallRecipeDetailsScraping(src *html.Node) entity.RecipeDetails
 }

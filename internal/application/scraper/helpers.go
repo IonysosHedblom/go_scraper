@@ -3,10 +3,10 @@ package scraper
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
+	"github.com/ionysoshedblom/go_scraper/internal/shared"
 )
 
 func isRegexMatch(regex string, target string) bool {
@@ -79,20 +79,11 @@ func mapSliceValuesToRecipe(
 	return recipes
 }
 
-func convertStringToInt64(str string) (*int64, error) {
-	if n, err := strconv.Atoi(str); err == nil {
-		n64 := int64(n)
-		return &n64, nil
-	} else {
-		return nil, err
-	}
-}
-
 func mapIdsToInt64(idSlice []string) ([]int64, error) {
 	var int64Slice []int64
 
 	for _, str := range idSlice {
-		num, err := convertStringToInt64(str)
+		num, err := shared.ConvertStringToInt64(str)
 		if err != nil {
 			fmt.Println("String is not convertible to int64")
 			return nil, err

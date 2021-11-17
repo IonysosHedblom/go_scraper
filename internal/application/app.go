@@ -26,9 +26,8 @@ func (a application) CallRecipeResultScraping(src *html.Node) ([]entity.Recipe, 
 	return recipes, nil
 }
 
-func (a application) CallRecipeDetailsScraping(src *html.Node) (u, i, c []string) {
-	units, ingredients, checklist := a.scraper.GetRecipeDetails(src)
+func (a application) CallRecipeDetailsScraping(src *html.Node) entity.RecipeDetails {
+	recipeDetails := a.scraper.GetRecipeDetails(src)
 
-	return units, ingredients, checklist
-
+	return recipeDetails
 }

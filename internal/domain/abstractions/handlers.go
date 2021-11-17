@@ -12,6 +12,7 @@ type RecipeHandler interface {
 	GetRecipesByIngredientSearchId(id int64) ([]entity.Recipe, error)
 	UpdateRecipeQueryId(queryId *int64, recipeId int64) error
 	UpdateRecipeIngredientSearchId(ingredientSearchId *int64, recipeId int64) error
+	UpdateIngredientsAndChecklist(ingredients, checklist []string, recipeId int64) error
 }
 
 type PerformedQueryHandler interface {
