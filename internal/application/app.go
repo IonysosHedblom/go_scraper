@@ -17,11 +17,18 @@ func NewApplication(scraper abstractions.ScraperPort) *application {
 }
 
 func (a application) CallRecipeResultScraping(src *html.Node) ([]entity.Recipe, error) {
-	stringSrc, err := a.scraper.GetRecipeResults(src)
+	recipes, err := a.scraper.GetRecipeResults(src)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return stringSrc, nil
+	return recipes, nil
+}
+
+func (a application) CallRecipeDetailsScraping(src *html.Node) (u, i, c []string) {
+	units, ingredients, checklist := a.scraper.GetRecipeDetails(src)
+
+	return units, ingredients, checklist
+
 }
