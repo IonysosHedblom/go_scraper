@@ -91,7 +91,7 @@ func findRecipeDetails(n *html.Node) (u, i, c []string) {
 	var visitNode func(n *html.Node)
 	visitNode = func(n *html.Node) {
 		isElementNode := n.Type == html.ElementNode
-		isUnit := isElementNode && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__qty"
+		isUnit := isElementNode && n.Parent.Data == "div" && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__qty"
 		isIngredient := isElementNode && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__ingr"
 		isChecklist := isElementNode && n.Data == "div" && n.Attr[0].Val == "cooking-steps-main__text"
 

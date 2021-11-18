@@ -49,7 +49,7 @@ func buildRecipePageUrl(title string, id string) string {
 	title = strings.ReplaceAll(title, "ö", "o")
 	title = strings.ReplaceAll(title, "å", "a")
 
-	url := fmt.Sprintf("https://www.ica.se/recept/%s-%s", title, id)
+	url := fmt.Sprintf("https://www.ica.se/recept/%s-%s/", title, id)
 	fmt.Println(url)
 	return url
 }
