@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
@@ -25,25 +26,26 @@ func (s *scraper) GetRecipeResults(n *html.Node) ([]entity.Recipe, error) {
 	return recipes, nil
 }
 
-func (s *scraper) GetRecipeDetails(n *html.Node) entity.RecipeDetails {
-	u, i, c := findRecipeDetails(n)
-	recipeDetails := mapDetailsToStruct(u, i, c)
-	return recipeDetails
+func (s *scraper) GetRecipeDetails(n *html.Node) string {
+	// u, i, c := findRecipeDetails(n)
+	target := findRecipeDetails(n)
+	// recipeDetails := mapDetailsToStruct(u, i, c)
+	return target
 }
 
-func mapDetailsToStruct(units, ingredients, checklist []string) entity.RecipeDetails {
-	var recipeDetails entity.RecipeDetails
-	var combinedUnitAndIngredient []string
+// func mapDetailsToStruct(units, ingredients, checklist []string) entity.RecipeDetails {
+// 	var recipeDetails entity.RecipeDetails
+// 	var combinedUnitAndIngredient []string
 
-	for i := 0; i < len(ingredients); i++ {
-		combinedUnitAndIngredient = append(combinedUnitAndIngredient, ingredients[i]+" "+units[i])
-	}
+// 	for i := 0; i < len(ingredients); i++ {
+// 		combinedUnitAndIngredient = append(combinedUnitAndIngredient, ingredients[i]+" "+units[i])
+// 	}
 
-	recipeDetails.Ingredients = combinedUnitAndIngredient
-	recipeDetails.Checklist = checklist
+// 	recipeDetails.Ingredients = combinedUnitAndIngredient
+// 	recipeDetails.Checklist = checklist
 
-	return recipeDetails
-}
+// 	return recipeDetails
+// }
 
 func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) {
 	const imgRegex string = `\n\s+<img src=`
@@ -83,33 +85,25 @@ func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) 
 	return titles, descriptions, imageUrls, recipeIds, ingredients
 }
 
-func findRecipeDetails(n *html.Node) (u, i, c []string) {
-	var units []string
-	var ingredients []string
-	var checklist []string
+func findRecipeDetails(n *html.Node) string {
+	var target string = ""
+	// var ingredients []string
+	// var checklist []string
 
 	var visitNode func(n *html.Node)
-	visitNode = func(n *html.Node) {
-		isElementNode := n.Type == html.ElementNode
-		isUnit := isElementNode && n.Parent.Data == "div" && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__qty"
-		isIngredient := isElementNode && n.Data == "span" && n.Attr[0].Val == "ingredients-list-group__card__ingr"
-		isChecklist := isElementNode && n.Data == "div" && n.Attr[0].Val == "cooking-steps-main__text"
 
-		if isUnit {
-			units = append(units, n.FirstChild.Data)
-		} else if isIngredient {
-			ingredients = append(ingredients, n.FirstChild.Data)
-		} else if isChecklist {
-			checklist = append(checklist, n.FirstChild.Data)
+	visitNode = func(n *html.Node) {
+		if n.Data == "script" && n.Attr[1].Val == "application/ld+json" {
+			fmt.Println(n.FirstChild.Data)
+			target += n.FirstChild.Data
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			visitNode(c)
 		}
 	}
-
 	forEachNode(n, visitNode, nil)
-	return units, ingredients, checklist
+	return target
 }
 
 func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
