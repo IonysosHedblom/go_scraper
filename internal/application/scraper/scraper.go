@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
@@ -94,7 +93,6 @@ func findRecipeDetails(n *html.Node) string {
 
 	visitNode = func(n *html.Node) {
 		if n.Data == "script" && n.Attr[1].Val == "application/ld+json" {
-			fmt.Println(n.FirstChild.Data)
 			target += n.FirstChild.Data
 		}
 

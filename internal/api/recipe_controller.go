@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -72,7 +71,8 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 	}
 
 	recipeDetails := s.app.CallRecipeDetailsScraping(document)
-
+	trimmedRecipeDetails := strings.ReplaceAll(recipeDetails, `\`, "")
+	fmt.Println(trimmedRecipeDetails)
 	// recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
 
 	if err != nil {
@@ -87,14 +87,12 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	json, err := json.Marshal(recipeDetails)
-
 	if err != nil {
 		http.Error(w, "error marshaling json", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	w.Write([]byte(trimmedRecipeDetails))
 
 }
