@@ -20,6 +20,7 @@ func (s *api) RecipeDetailsRouter(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
+	var recipe entity.Recipe
 	queries := req.URL.Query()
 
 	if len(queries) > 2 {
@@ -30,29 +31,6 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 	recipeTitle := queries["title"][0]
 	recipeId := queries["id"][0]
 
-	url := buildRecipePageUrl(recipeTitle, recipeId)
-	document, err := s.TrimHtmlAndCallSrc(url)
-
-	if err != nil {
-		http.Error(w, "error getting the external source html", http.StatusInternalServerError)
-		return
-	}
-	r := s.app.CallRecipeDetailsScraping(document)
-	var response entity.RecipeDetailsResponse
-
-	err = json.Unmarshal([]byte(r), &response)
-
-	if err != nil {
-		http.Error(w, "error getting recipedetails in struct", http.StatusInternalServerError)
-		return
-	}
-
-	recipeDetails := &entity.RecipeDetails{
-		Ingredients:  response.RecipeIngredient,
-		Instructions: getInstructions(response.RecipeInstructions),
-		Rating:       fmt.Sprintf("%f", response.Rating.RatingValue),
-	}
-
 	recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
 
 	if err != nil {
@@ -60,15 +38,63 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = s.handlers.RecipeHandler.Update(recipeDetails.Ingredients, recipeDetails.Instructions, recipeDetails.Rating, *recipeIdAsInt64)
+	recipeInDb, err := s.handlers.RecipeHandler.GetRecipeById(*recipeIdAsInt64)
 
 	if err != nil {
-		http.Error(w, "db error updating ingredients and checklist", http.StatusInternalServerError)
+		http.Error(w, "error fetching recipe from db", http.StatusInternalServerError)
 		return
 	}
 
-	js, _ := json.Marshal(recipeDetails)
+	if recipeInDb.Checklist == nil {
+		url := buildRecipePageUrl(recipeTitle, recipeId)
+		document, err := s.TrimHtmlAndCallSrc(url)
+
+		if err != nil {
+			http.Error(w, "error getting the external source html", http.StatusInternalServerError)
+			return
+		}
+		r := s.app.CallRecipeDetailsScraping(document)
+		var response entity.RecipeDetailsResponse
+
+		err = json.Unmarshal([]byte(r), &response)
+
+		if err != nil {
+			http.Error(w, "error getting recipedetails in struct", http.StatusInternalServerError)
+			return
+		}
+
+		recipeDetails := &entity.RecipeDetails{
+			Ingredients:  response.RecipeIngredient,
+			Instructions: getInstructions(response.RecipeInstructions),
+			Rating:       fmt.Sprintf("%f", response.Rating.RatingValue),
+		}
+
+		err = s.handlers.RecipeHandler.Update(recipeDetails.Ingredients, recipeDetails.Instructions, recipeDetails.Rating, *recipeIdAsInt64)
+
+		if err != nil {
+			http.Error(w, "db error updating ingredients and checklist", http.StatusInternalServerError)
+			return
+		}
+
+		recipePointer, err := s.handlers.RecipeHandler.GetRecipeById(*recipeIdAsInt64)
+		if err != nil {
+			http.Error(w, "db error returning recipe", http.StatusInternalServerError)
+			return
+		}
+
+		recipe = *recipePointer
+	} else {
+		recipePointer, err := s.handlers.RecipeHandler.GetRecipeById(*recipeIdAsInt64)
+		if err != nil {
+			http.Error(w, "db error returning recipe", http.StatusInternalServerError)
+			return
+		}
+
+		recipe = *recipePointer
+	}
+
+	j, _ := json.Marshal(recipe)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	w.Write(j)
 }
