@@ -92,12 +92,16 @@ func findRecipeDetails(n *html.Node) string {
 	var visitNode func(n *html.Node)
 
 	visitNode = func(n *html.Node) {
-		if n.Data == "script" && n.Attr[1].Val == "application/ld+json" {
-			target += n.FirstChild.Data
-		}
+		if target == "" {
+			if n.Data == "script" && n.Attr[1].Val == "application/ld+json" {
+				target += n.FirstChild.Data
+			}
 
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			visitNode(c)
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				visitNode(c)
+			}
+		} else {
+			return
 		}
 	}
 	forEachNode(n, visitNode, nil)

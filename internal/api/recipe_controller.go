@@ -54,6 +54,15 @@ func (s *api) TrimHtmlAndCallSrc(url string) (*html.Node, error) {
 	return doc, nil
 }
 
+func getInstructions(in []entity.Instruction) []string {
+	var out []string
+
+	for _, i := range in {
+		out = append(out, i.Text)
+	}
+	return out
+}
+
 func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 	queries := req.URL.Query()
 
@@ -73,15 +82,20 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	r := s.app.CallRecipeDetailsScraping(document)
-	fmt.Println(r)
-	jsonMap := make(map[string]interface{})
-	// rating := jsonMap["aggegateRating"].(map[string]interface{})
-	json.Unmarshal([]byte(r), &jsonMap)
-	recipeDetails := &entity.RecipeDetails{
-		Ingredients:  jsonMap["recipeIngredient"].([]string),
-		Instructions: jsonMap["recipeInstructions"].([]string),
-		// Rating:       rating["ratingValue"].(string),
+	var response entity.RecipeDetailsResponse
+
+	err = json.Unmarshal([]byte(r), &response)
+
+	if err != nil {
+		http.Error(w, "error getting recipedetails in struct", http.StatusInternalServerError)
+		return
 	}
+	recipeDetails := &entity.RecipeDetails{
+		Ingredients:  response.RecipeIngredient,
+		Instructions: getInstructions(response.RecipeInstructions),
+		Rating:       fmt.Sprintf("%f", response.Rating.RatingValue),
+	}
+	fmt.Println(recipeDetails.Rating)
 
 	recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
 
@@ -97,8 +111,8 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	j, _ := json.Marshal(recipeDetails)
+	js, _ := json.Marshal(recipeDetails)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+	w.Write(js)
 }

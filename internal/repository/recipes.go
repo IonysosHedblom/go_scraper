@@ -134,7 +134,7 @@ func (r *recipeStore) Update(ingredients, checklist []string, rating string, rec
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	dbQuery := "UPDATE recipes SET ingredients = $1, checklist = $2, rating = $3 WHERE recipe_id = $3"
+	dbQuery := "UPDATE recipes SET ingredients = $1, checklist = $2, rating = $3 WHERE recipe_id = $4"
 	statement, err := r.db.PrepareContext(ctx, dbQuery)
 
 	if err != nil {
