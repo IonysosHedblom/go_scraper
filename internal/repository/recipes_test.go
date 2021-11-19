@@ -117,7 +117,14 @@ func TestCreate(t *testing.T) {
 	dbQuery := "INSERT INTO recipes \\(recipe_id, title, description, imageurl, ingredients, query_id\\) VALUES \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6\\)"
 
 	prep := mock.ExpectPrepare(dbQuery)
-	prep.ExpectExec().WithArgs(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId).WillReturnResult(sqlmock.NewResult(0, 1))
+	prep.ExpectExec().WithArgs(
+		recipe.Id,
+		recipe.Title,
+		recipe.Description,
+		recipe.ImageUrl,
+		pq.Array(recipe.Ingredients),
+		recipe.QueryId,
+	).WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := repo.Create(recipe)
 	assert.NoError(t, err)
@@ -136,7 +143,12 @@ func TestUpdate(t *testing.T) {
 
 	prep := mock.ExpectPrepare(dbQuery)
 
-	prep.ExpectExec().WithArgs(pq.Array(recipe.Ingredients), pq.Array(recipe.Checklist), recipe.Rating, recipe.Id).WillReturnResult(sqlmock.NewResult(0, 0))
+	prep.ExpectExec().WithArgs(
+		pq.Array(recipe.Ingredients),
+		pq.Array(recipe.Checklist),
+		recipe.Rating,
+		recipe.Id,
+	).WillReturnResult(sqlmock.NewResult(0, 0))
 
 	err := repo.Update(recipe.Ingredients, recipe.Checklist, *recipe.Rating, recipe.Id)
 
@@ -192,7 +204,14 @@ func TestCreateFromIngredients(t *testing.T) {
 	dbQuery := "INSERT INTO recipes \\(recipe_id, title, description, imageurl, ingredients, ingredient_search_id\\) VALUES \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6\\)"
 	prep := mock.ExpectPrepare(dbQuery)
 
-	prep.ExpectExec().WithArgs(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.IngredientSearchId).WillReturnResult(sqlmock.NewResult(0, 1))
+	prep.ExpectExec().WithArgs(
+		recipe.Id,
+		recipe.Title,
+		recipe.Description,
+		recipe.ImageUrl,
+		pq.Array(recipe.Ingredients),
+		recipe.IngredientSearchId,
+	).WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := repo.CreateFromIngredients(recipe)
 
