@@ -1,11 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
+	"github.com/ionysoshedblom/go_scraper/internal/shared"
 	"golang.org/x/net/html"
 )
 
@@ -69,30 +72,33 @@ func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "error getting the external source html", http.StatusInternalServerError)
 		return
 	}
+	r := s.app.CallRecipeDetailsScraping(document)
+	fmt.Println(r)
+	jsonMap := make(map[string]interface{})
+	// rating := jsonMap["aggegateRating"].(map[string]interface{})
+	json.Unmarshal([]byte(r), &jsonMap)
+	recipeDetails := &entity.RecipeDetails{
+		Ingredients:  jsonMap["recipeIngredient"].([]string),
+		Instructions: jsonMap["recipeInstructions"].([]string),
+		// Rating:       rating["ratingValue"].(string),
+	}
 
-	recipeDetails := s.app.CallRecipeDetailsScraping(document)
-	trimmedRecipeDetails := strings.ReplaceAll(recipeDetails, `\`, "")
-	fmt.Println(trimmedRecipeDetails)
-	// recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
+	recipeIdAsInt64, err := shared.ConvertStringToInt64(recipeId)
 
 	if err != nil {
 		http.Error(w, "cant convert string to int64", http.StatusInternalServerError)
 		return
 	}
 
-	// err = s.handlers.RecipeHandler.UpdateIngredientsAndChecklist(recipeDetails.Ingredients, recipeDetails.Checklist, *recipeIdAsInt64)
+	err = s.handlers.RecipeHandler.Update(recipeDetails.Ingredients, recipeDetails.Instructions, recipeDetails.Rating, *recipeIdAsInt64)
 
 	if err != nil {
 		http.Error(w, "db error updating ingredients and checklist", http.StatusInternalServerError)
 		return
 	}
 
-	if err != nil {
-		http.Error(w, "error marshaling json", http.StatusInternalServerError)
-		return
-	}
+	j, _ := json.Marshal(recipeDetails)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(trimmedRecipeDetails))
-
+	w.Write(j)
 }

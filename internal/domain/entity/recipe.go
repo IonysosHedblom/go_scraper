@@ -11,6 +11,7 @@ type Recipe struct {
 }
 
 type RecipeDetails struct {
-	Ingredients []string
-	Checklist   []string
+	Ingredients  []string `json:"ingredients"`
+	Instructions []string `json:"instructions"`
+	Rating       string   `json:"rating"`
 }
