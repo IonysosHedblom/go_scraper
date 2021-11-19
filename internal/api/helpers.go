@@ -2,9 +2,11 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 	"golang.org/x/net/html"
 )
 
@@ -22,6 +24,38 @@ func (s *api) CallSource(url string) (*html.Node, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s as HTML: %v", url, err)
+	}
+
+	return doc, nil
+}
+
+func (s *api) TrimHtmlAndCallSrc(url string) (*html.Node, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("getting %s: %s", url, res.Status)
+	}
+
+	defer res.Body.Close()
+
+	src, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("reading %s: %s", url, res.Status)
+	}
+
+	strToReplace := `<li style="display:;"><a href="/handla/" class="navigation__item">Handla online</a> <!----></li>`
+
+	cleanHTML := strings.ReplaceAll(string(src), strToReplace, "")
+	cleanerHTML := strings.Split(cleanHTML, `<div class="comment-section__wrapper extra-padding"><div class="comment-section__write-comment"><div aria-label="Skriv din kommentar" class="input-textarea input-textarea--56 input-textarea--simple">`)
+	cleanestHTML := cleanerHTML[0] + "</body>" + "\n" + "</html>"
+	doc, err := html.Parse(strings.NewReader(cleanestHTML))
+
+	if err != nil {
+		return nil, err
 	}
 
 	return doc, nil
@@ -52,4 +86,13 @@ func buildRecipePageUrl(title string, id string) string {
 	url := fmt.Sprintf("https://www.ica.se/recept/%s-%s/", title, id)
 	fmt.Println(url)
 	return url
+}
+
+func getInstructions(in []entity.Instruction) []string {
+	var out []string
+
+	for _, i := range in {
+		out = append(out, i.Text)
+	}
+	return out
 }

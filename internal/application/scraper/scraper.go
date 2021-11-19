@@ -26,25 +26,10 @@ func (s *scraper) GetRecipeResults(n *html.Node) ([]entity.Recipe, error) {
 }
 
 func (s *scraper) GetRecipeDetails(n *html.Node) string {
-	// u, i, c := findRecipeDetails(n)
 	target := findRecipeDetails(n)
-	// recipeDetails := mapDetailsToStruct(u, i, c)
+
 	return target
 }
-
-// func mapDetailsToStruct(units, ingredients, checklist []string) entity.RecipeDetails {
-// 	var recipeDetails entity.RecipeDetails
-// 	var combinedUnitAndIngredient []string
-
-// 	for i := 0; i < len(ingredients); i++ {
-// 		combinedUnitAndIngredient = append(combinedUnitAndIngredient, ingredients[i]+" "+units[i])
-// 	}
-
-// 	recipeDetails.Ingredients = combinedUnitAndIngredient
-// 	recipeDetails.Checklist = checklist
-
-// 	return recipeDetails
-// }
 
 func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) {
 	const imgRegex string = `\n\s+<img src=`
@@ -86,9 +71,6 @@ func findRecipeInformation(n *html.Node) (t, d, i, ri []string, ing [][]string) 
 
 func findRecipeDetails(n *html.Node) string {
 	var target string = ""
-	// var ingredients []string
-	// var checklist []string
-
 	var visitNode func(n *html.Node)
 
 	visitNode = func(n *html.Node) {
