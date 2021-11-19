@@ -12,14 +12,18 @@ import (
 )
 
 var qid int64 = 5
-
+var iid int64 = 10
+var rating string = "2.2"
 var recipe = &entity.Recipe{
-	Id:          5,
-	Title:       "test",
-	Description: "testDesc",
-	ImageUrl:    "https://testimgurl.jpg",
-	Ingredients: []string{"test1", "test2"},
-	QueryId:     &qid,
+	Id:                 5,
+	Title:              "test",
+	Description:        "testDesc",
+	ImageUrl:           "https://testimgurl.jpg",
+	Ingredients:        []string{"test1", "test2"},
+	Checklist:          []string{"testcheck", "testcheck2"},
+	Rating:             &rating,
+	QueryId:            &qid,
+	IngredientSearchId: &iid,
 }
 
 func NewRecipeRepositoryMock() (*sql.DB, sqlmock.Sqlmock) {
@@ -104,5 +108,81 @@ func TestCreate(t *testing.T) {
 	prep.ExpectExec().WithArgs(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId).WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := repo.Create(recipe)
+	assert.NoError(t, err)
+}
+
+func TestUpdate(t *testing.T) {
+	db, mock := NewPqRepositoryMock()
+
+	repo := &recipeStore{db}
+
+	defer func() {
+		repo.db.Close()
+	}()
+
+	dbQuery := "UPDATE recipes SET ingredients = \\$1, checklist = \\$2, rating = \\$3 WHERE recipe_id = \\$4"
+
+	prep := mock.ExpectPrepare(dbQuery)
+
+	prep.ExpectExec().WithArgs(pq.Array(recipe.Ingredients), pq.Array(recipe.Checklist), recipe.Rating, recipe.Id).WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := repo.Update(recipe.Ingredients, recipe.Checklist, *recipe.Rating, recipe.Id)
+
+	assert.NoError(t, err)
+}
+
+func TestUpdateIngredientSearchId(t *testing.T) {
+	db, mock := NewPqRepositoryMock()
+
+	repo := &recipeStore{db}
+
+	defer func() {
+		repo.db.Close()
+	}()
+
+	dbQuery := "UPDATE recipes SET ingredient_search_id = \\$1 WHERE recipe_id = \\$2"
+	prep := mock.ExpectPrepare(dbQuery)
+
+	prep.ExpectExec().WithArgs(recipe.IngredientSearchId, recipe.Id).WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := repo.UpdateIngredientSearchId(recipe.IngredientSearchId, recipe.Id)
+
+	assert.NoError(t, err)
+}
+
+func TestUpdateQueryId(t *testing.T) {
+	db, mock := NewPqRepositoryMock()
+
+	repo := &recipeStore{db}
+
+	defer func() {
+		repo.db.Close()
+	}()
+
+	dbQuery := "UPDATE recipes SET query_id = \\$1 WHERE recipe_id = \\$2"
+	prep := mock.ExpectPrepare(dbQuery)
+
+	prep.ExpectExec().WithArgs(recipe.QueryId, recipe.Id).WillReturnResult(sqlmock.NewResult(0, 0))
+
+	err := repo.UpdateQueryId(recipe.QueryId, recipe.Id)
+
+	assert.NoError(t, err)
+}
+
+func TestCreateFromIngredients(t *testing.T) {
+	db, mock := NewPqRepositoryMock()
+
+	repo := &recipeStore{db}
+
+	defer func() {
+		repo.db.Close()
+	}()
+	dbQuery := "INSERT INTO recipes \\(recipe_id, title, description, imageurl, ingredients, ingredient_search_id\\) VALUES \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6\\)"
+	prep := mock.ExpectPrepare(dbQuery)
+
+	prep.ExpectExec().WithArgs(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.IngredientSearchId).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := repo.CreateFromIngredients(recipe)
+
 	assert.NoError(t, err)
 }
