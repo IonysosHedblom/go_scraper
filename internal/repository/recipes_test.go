@@ -56,7 +56,19 @@ func TestGetByQueryId(t *testing.T) {
 			"ingredients",
 			"query_id",
 			"ingredient_search_id",
-		}).AddRow(recipe.Id, recipe.Title, recipe.Description, recipe.ImageUrl, pq.Array(recipe.Ingredients), recipe.QueryId, recipe.IngredientSearchId)
+			"checklist",
+			"rating",
+		}).AddRow(
+		recipe.Id,
+		recipe.Title,
+		recipe.Description,
+		recipe.ImageUrl,
+		pq.Array(recipe.Ingredients),
+		pq.Array(recipe.Checklist),
+		recipe.Rating,
+		recipe.QueryId,
+		recipe.IngredientSearchId,
+	)
 
 	mock.ExpectQuery(dbQuery).WithArgs(recipe.QueryId).WillReturnRows(rows)
 
