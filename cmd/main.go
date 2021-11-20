@@ -25,6 +25,7 @@ func main() {
 	scraper := scraper.New()
 	handlers := handlers.NewHandlers(repo)
 	app := application.NewApplication(scraper)
+	repo.ItemsStore.InsertRows()
 
 	httpServer := api.NewApi(app, handlers)
 	httpServer.Run()

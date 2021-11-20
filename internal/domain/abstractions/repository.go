@@ -26,3 +26,7 @@ type IngredientSearchesStore interface {
 	GetById(id int) (*entity.IngredientSearch, error)
 	Create(ingredients []string) (*int64, error)
 }
+
+type ItemsStore interface {
+	InsertRows()
+}

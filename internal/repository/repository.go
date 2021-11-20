@@ -10,6 +10,7 @@ type Repository struct {
 	PerformedQueriesStore   abstractions.PerformedQueriesStore
 	RecipeStore             abstractions.RecipeStore
 	IngredientSearchesStore abstractions.IngredientSearchesStore
+	ItemsStore              abstractions.ItemsStore
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -17,5 +18,6 @@ func NewRepository(db *sql.DB) *Repository {
 		PerformedQueriesStore:   NewPerformedQueriesStore(db),
 		RecipeStore:             NewRecipeStore(db),
 		IngredientSearchesStore: NewIngredientSearchStore(db),
+		ItemsStore:              NewItemsStore(db),
 	}
 }
