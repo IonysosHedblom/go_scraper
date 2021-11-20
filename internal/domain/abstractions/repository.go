@@ -28,5 +28,4 @@ type IngredientSearchesStore interface {
 }
 
 type ItemsStore interface {
-	InsertRows()
 }
