@@ -57,10 +57,28 @@ func (i *itemsStore) GetItemsByUserId(id string) ([]entity.Item, error) {
 	return items, nil
 }
 
-// func (i *itemsStore) AddItemsToUserInventory(id string, items []entity.Item) error {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
+func (i *itemsStore) AddItemsToUserInventory(id int64, items []entity.Item) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-// 	dbQuery := "INSERT INTO "
+	dbQuery := "INSERT INTO inventory_items (item_id, inventory_id, quantity) VALUES ($1, $2, $3)"
 
-// }
+	statement, err := i.db.PrepareContext(ctx, dbQuery)
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	for _, item := range items {
+		_, err = statement.ExecContext(
+			ctx,
+			item.Id,
+			id,
+			item.Quantity,
+		)
+	}
+
+	return err
+}
