@@ -9,6 +9,7 @@ type Handlers struct {
 	RecipeHandler           abstractions.RecipeHandler
 	PqHandler               abstractions.PerformedQueryHandler
 	IngredientSearchHandler abstractions.IngredientSearchHandler
+	InventoryHandler        abstractions.InventoryHandler
 }
 
 func NewHandlers(repo *repository.Repository) *Handlers {
@@ -16,5 +17,6 @@ func NewHandlers(repo *repository.Repository) *Handlers {
 		RecipeHandler:           NewRecipeHandler(repo),
 		PqHandler:               NewPqHandler(repo),
 		IngredientSearchHandler: NewIngredientSearchHandler(repo),
+		InventoryHandler:        NewInventoryHandler(repo),
 	}
 }

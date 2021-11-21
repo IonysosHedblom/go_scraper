@@ -27,11 +27,8 @@ type IngredientSearchesStore interface {
 	Create(ingredients []string) (*int64, error)
 }
 
-type ItemsStore interface {
-	GetItemsByUserId(id string) ([]entity.Item, error)
-	// AddItemsToUserInventory(id string, items []entity.Item) error
-}
-
 type InventoryStore interface {
-	Create(id int64) error
+	Create(id string) error
+	GetItems(id string) ([]entity.Item, error)
+	AddItemsToUserInventory(items []entity.InventoryItem) error
 }

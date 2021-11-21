@@ -24,3 +24,9 @@ type IngredientSearchHandler interface {
 	GetIngredientSearch(ingredients []string) (*entity.IngredientSearch, error)
 	CreateIngredientSearch(ingredients []string) (*int64, error)
 }
+
+type InventoryHandler interface {
+	Get(userId string) ([]entity.Item, error)
+	Create(userId string) error
+	AddItems(items []entity.InventoryItem) error
+}

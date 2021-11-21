@@ -13,11 +13,14 @@ type Item struct {
 	VolumeAmount string `json:"volume_amount"`
 	VolumeUnit   string `json:"volume_unit"`
 	Category     string `json:"category"`
-	Quantity     int    `json:"quantity"`
 }
 
 type InventoryItem struct {
-	Id          int64 `json:"inventory_item_id"`
 	ItemId      int64 `json:"item_id"`
 	InventoryId int64 `json:"inventory_id"`
+	Quantity    int   `json:"quantity"`
+}
+
+type AddItemsRequest struct {
+	Items []InventoryItem `json:"items"`
 }
