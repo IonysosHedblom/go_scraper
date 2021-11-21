@@ -80,10 +80,6 @@ func (r *recipeStore) GetByQueryId(id int64) ([]entity.Recipe, error) {
 		recipes = append(recipes, *recipe)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	return recipes, nil
 }
 

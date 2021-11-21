@@ -1,11 +1,11 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"os"
+	"time"
+
+	"github.com/ionysoshedblom/go_scraper/internal/domain/entity"
 )
 
 type itemsStore struct {
@@ -16,21 +16,43 @@ func NewItemsStore(db *sql.DB) *itemsStore {
 	return &itemsStore{db: db}
 }
 
-func getItemMap() []map[string]string {
-	jsonFile, err := os.Open("localization.json")
+func (i *itemsStore) GetItemsByUserId(id string) ([]entity.Item, error) {
+	var items []entity.Item
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbQuery := `SELECT (name, imageurl, expire_date, volume_amount, volume_unit, category, quantity) FROM items
+	INNER JOIN inventory_items ON items.item_id = inventory_items.item_id
+	INNER JOIN inventories ON inventory_items.inventory_id = inventories.inventory_id
+	WHERE inventories.user_id = $1`
+
+	rows, err := i.db.QueryContext(ctx, dbQuery, id)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	defer rows.Close()
 
-	var jMap []map[string]string
-	err = json.Unmarshal(byteValue, &jMap)
+	for rows.Next() {
+		item := new(entity.Item)
+		err := rows.Scan(
+			&item.Id,
+			&item.Name,
+			&item.ImageUrl,
+			&item.ExpireDate,
+			&item.VolumeAmount,
+			&item.VolumeUnit,
+			&item.Category,
+			&item.Quantity,
+		)
 
-	if err != nil {
-		fmt.Println(err)
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, *item)
 	}
 
-	return jMap
+	return items, nil
 }

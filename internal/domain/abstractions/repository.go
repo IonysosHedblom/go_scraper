@@ -28,4 +28,5 @@ type IngredientSearchesStore interface {
 }
 
 type ItemsStore interface {
+	GetItemsByUserId(id string) ([]entity.Item, error)
 }

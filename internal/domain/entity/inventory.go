@@ -21,8 +21,3 @@ type InventoryItem struct {
 	ItemId      int64 `json:"item_id"`
 	InventoryId int64 `json:"inventory_id"`
 }
-
-// SELECT * FROM items
-// INNER JOIN inventory_items ON inventory_items.item_id = items.item_id
-// INNER JOIN inventories ON inventory.inventory_id = inventory_items.inventory_id
-// WHERE inventory.user_id = 123
