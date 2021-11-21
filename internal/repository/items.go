@@ -56,3 +56,11 @@ func (i *itemsStore) GetItemsByUserId(id string) ([]entity.Item, error) {
 
 	return items, nil
 }
+
+// func (i *itemsStore) AddItemsToUserInventory(id string, items []entity.Item) error {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
+
+// 	dbQuery := "INSERT INTO "
+
+// }

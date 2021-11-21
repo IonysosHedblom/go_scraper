@@ -11,6 +11,7 @@ type Repository struct {
 	RecipeStore             abstractions.RecipeStore
 	IngredientSearchesStore abstractions.IngredientSearchesStore
 	ItemsStore              abstractions.ItemsStore
+	InventoryStore          abstractions.InventoryStore
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -19,5 +20,6 @@ func NewRepository(db *sql.DB) *Repository {
 		RecipeStore:             NewRecipeStore(db),
 		IngredientSearchesStore: NewIngredientSearchStore(db),
 		ItemsStore:              NewItemsStore(db),
+		InventoryStore:          NewInventoryStore(db),
 	}
 }
