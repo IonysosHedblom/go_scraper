@@ -36,10 +36,10 @@ func (is *inventoryStore) Create(id string) error {
 func (i *inventoryStore) GetItems(id string) ([]entity.Item, error) {
 	var items []entity.Item
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	dbQuery := `SELECT (name, imageurl, expire_date, volume_amount, volume_unit, category, quantity) FROM items
+	dbQuery := `SELECT items.item_id, name, imageurl, expire_date, volume_amount, volume_unit, category FROM items
 	INNER JOIN inventory_items ON items.item_id = inventory_items.item_id
 	INNER JOIN inventories ON inventory_items.inventory_id = inventories.inventory_id
 	WHERE inventories.user_id = $1`

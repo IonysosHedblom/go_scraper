@@ -8,7 +8,7 @@ type Inventory struct {
 type Item struct {
 	Id           int64  `json:"item_id"`
 	Name         string `json:"name"`
-	ImageUrl     string `json:"image_url"`
+	ImageUrl     string `json:"imageurl"`
 	ExpireDate   string `json:"expire_date"`
 	VolumeAmount string `json:"volume_amount"`
 	VolumeUnit   string `json:"volume_unit"`

@@ -35,11 +35,6 @@ func (s *api) GetItems(w http.ResponseWriter, req *http.Request) {
 
 	itemsFromDb, err := s.handlers.InventoryHandler.Get(q[0])
 
-	if err.Error() == "sql: no rows in result set" {
-		http.Error(w, "This user has no items in their inventory", http.StatusBadRequest)
-		return
-	}
-
 	if err != nil {
 		http.Error(w, "Error fetching items from db for this user", http.StatusInternalServerError)
 		return
