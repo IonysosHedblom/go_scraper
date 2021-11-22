@@ -22,6 +22,7 @@ func (a *api) Run() {
 	http.HandleFunc("/api/scraper", a.ScraperRouter)
 	http.HandleFunc("/api/recipeDetails", a.RecipeDetailsRouter)
 	http.HandleFunc("/api/inventory", a.InventoryRouter)
+
 	fmt.Println("Server running on port 8080")
 	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
