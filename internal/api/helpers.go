@@ -49,10 +49,10 @@ func (s *api) TrimHtmlAndCallSrc(url string) (*html.Node, error) {
 
 	strToReplace := `<li style="display:;"><a href="/handla/" class="navigation__item">Handla online</a> <!----></li>`
 
-	cleanHTML := strings.ReplaceAll(string(src), strToReplace, "")
-	cleanerHTML := strings.Split(cleanHTML, `<div class="comment-section__wrapper extra-padding"><div class="comment-section__write-comment"><div aria-label="Skriv din kommentar" class="input-textarea input-textarea--56 input-textarea--simple">`)
-	cleanestHTML := cleanerHTML[0] + "</body>" + "\n" + "</html>"
-	doc, err := html.Parse(strings.NewReader(cleanestHTML))
+	cleanSrcDoc := strings.ReplaceAll(string(src), strToReplace, "")
+	splitSrcDoc := strings.Split(cleanSrcDoc, `<div class="comment-section__wrapper extra-padding"><div class="comment-section__write-comment"><div aria-label="Skriv din kommentar" class="input-textarea input-textarea--56 input-textarea--simple">`)
+	completeSrcDoc := splitSrcDoc[0] + "</body>" + "\n" + "</html>"
+	doc, err := html.Parse(strings.NewReader(completeSrcDoc))
 
 	if err != nil {
 		return nil, err
@@ -84,7 +84,6 @@ func buildRecipePageUrl(title string, id string) string {
 	title = strings.ReplaceAll(title, "å", "a")
 
 	url := fmt.Sprintf("https://www.ica.se/recept/%s-%s/", title, id)
-	fmt.Println(url)
 	return url
 }
 
