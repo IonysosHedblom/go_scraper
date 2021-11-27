@@ -85,7 +85,6 @@ func mapIdsToInt64(idSlice []string) ([]int64, error) {
 	for _, str := range idSlice {
 		num, err := shared.ConvertStringToInt64(str)
 		if err != nil {
-			fmt.Println("String is not convertible to int64")
 			return nil, err
 		}
 
