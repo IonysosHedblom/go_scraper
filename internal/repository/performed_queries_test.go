@@ -114,7 +114,7 @@ func TestCreateError(t *testing.T) {
 		repo.db.Close()
 	}()
 
-	badDbQuery := "INSERT INTO performed_query \\(query\\) VALUES \\(\\$1\\) 2"
+	badDbQuery := "INSERT INTO performed_query \\(query\\) VALUES \\(\\$1\\)"
 
 	preparation := mock.ExpectPrepare(badDbQuery)
 	preparation.ExpectExec().WithArgs(performed_query.Query).WillReturnResult(sqlmock.NewResult(0, 0))
