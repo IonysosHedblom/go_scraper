@@ -204,6 +204,7 @@ func (s *api) Post(w http.ResponseWriter, req *http.Request) {
 	}
 
 	j, err := json.Marshal(recipes)
+
 	if err != nil {
 		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
 		return
