@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -205,7 +204,6 @@ func (s *api) Post(w http.ResponseWriter, req *http.Request) {
 	}
 
 	j, err := json.Marshal(recipes)
-	fmt.Println(j)
 	if err != nil {
 		http.Error(w, "Error marshaling json response", http.StatusInternalServerError)
 		return
