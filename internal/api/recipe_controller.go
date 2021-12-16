@@ -22,7 +22,7 @@ func (s *api) RecipeDetailsRouter(w http.ResponseWriter, req *http.Request) {
 func (s *api) GetRecipeDetails(w http.ResponseWriter, req *http.Request) {
 	var recipe entity.Recipe
 	queries := req.URL.Query()
-
+	fmt.Println(queries)
 	if len(queries) > 2 {
 		http.Error(w, "bad query param", http.StatusBadRequest)
 		return
